@@ -1,0 +1,914 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OBLIVIA — 망각의 균열 속에서</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=IBM+Plex+Mono:wght@400;500&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&family=Black+Han+Sans&family=Nanum+Myeongjo:wght@400;700;800&family=Gugi&family=Sunflower:wght@300;500;700&family=Song+Myung&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #0B0E13;
+    --surface: #12161E;
+    --surface-2: #171C26;
+    --line: #262C38;
+    --ash: #E7E4DC;
+    --ash-dim: #9CA1AC;
+    --rift: #7B6EF6;
+    --corrosion: #6E9C77;
+    --warp: #E0A458;
+    --siren: #E8A33D;
+  }
+
+  *{ box-sizing: border-box; margin:0; padding:0; }
+  html{ scroll-behavior: smooth; }
+
+  body{
+    background: var(--bg);
+    color: var(--ash);
+    font-family: 'Newsreader', serif;
+    font-weight: 400;
+    line-height: 1.6;
+    overflow-x: hidden;
+  }
+
+  ::selection{ background: var(--siren); color: #14110A; }
+
+  .mono{ font-family: 'IBM Plex Mono', monospace; }
+
+  h1, h2, h3, .display{
+    font-family: 'Bebas Neue', sans-serif;
+    font-weight: 400;
+    letter-spacing: 0.02em;
+    line-height: 0.95;
+  }
+
+  a{ color: inherit; text-decoration: none; }
+
+  @media (prefers-reduced-motion: reduce){
+    *{ animation-duration: 0.001ms !important; animation-iteration-count: 1 !important; transition-duration: 0.001ms !important; scroll-behavior: auto !important; }
+  }
+
+  /* ---------- nav ---------- */
+  nav{
+    position: fixed; top:0; left:0; right:0; z-index: 100;
+    display:flex; align-items:center; justify-content:space-between;
+    padding: 18px 32px;
+    background: rgba(11,14,19,0.82);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--line);
+  }
+  nav .brand{
+    font-family:'Bebas Neue', sans-serif;
+    font-size: 22px;
+    letter-spacing: 0.12em;
+  }
+  nav .brand span{ color: var(--siren); }
+  nav ul{
+    list-style:none;
+    display:flex; gap: 28px;
+  }
+  nav ul li a{
+    font-family:'IBM Plex Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ash-dim);
+    transition: color 0.2s ease;
+  }
+  nav ul li a:hover, nav ul li a:focus-visible{ color: var(--ash); outline: none; }
+  nav .toggle{ display:none; background:none; border:none; color:var(--ash); font-size:22px; cursor:pointer; }
+
+  @media (max-width: 760px){
+    nav ul{ display:none; }
+    nav .toggle{ display:block; }
+  }
+
+  /* ---------- ticker (signature element) — hazard/alert broadcast style ---------- */
+  .ticker-bar{
+    position: fixed; top: 72px; left:0; right:0; z-index: 99;
+    height: 40px;
+    display:flex;
+    background: var(--surface);
+    border-bottom: 1px solid var(--line);
+  }
+  .ticker-bar::before, .ticker-bar::after{
+    content:"";
+    display:block;
+    height: 4px;
+    background: repeating-linear-gradient(
+      135deg,
+      var(--siren) 0 10px,
+      #14110A 10px 20px
+    );
+  }
+  .ticker-bar{ flex-direction: column; }
+  .ticker-bar .row{ display:flex; flex:1; min-height:0; }
+
+  .alert-tag{
+    flex-shrink: 0;
+    display:flex; align-items:center; gap: 8px;
+    padding: 0 18px;
+    background: var(--siren);
+    color: #14110A;
+  }
+  .alert-tag span.label{
+    font-family:'IBM Plex Mono', monospace;
+    font-size: 11px; font-weight: 500;
+    letter-spacing: 0.14em;
+  }
+  .pulse-dot{
+    width:7px; height:7px; border-radius: 50%;
+    background: #14110A;
+    animation: pulse-alert 1.1s ease-in-out infinite;
+    flex-shrink:0;
+  }
+  @keyframes pulse-alert{ 0%,100%{ opacity: 1; } 50%{ opacity: 0.15; } }
+
+  .ticker-viewport{
+    flex:1; overflow:hidden; position: relative;
+    display:flex; align-items:center;
+  }
+  .ticker-viewport::after{
+    content:"";
+    position:absolute; top:0; right:0; bottom:0; width: 60px;
+    background: linear-gradient(to right, transparent, var(--surface));
+    pointer-events:none;
+  }
+  .ticker-track{
+    display:flex;
+    white-space: nowrap;
+    animation: scroll-left 32s linear infinite;
+  }
+  .ticker-group{
+    display:flex; align-items:center;
+    flex-shrink: 0;
+  }
+  .ticker-group span{
+    display:flex; align-items:center; gap: 8px;
+    font-family:'IBM Plex Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    color: var(--ash-dim);
+    padding: 0 26px;
+    border-right: 1px solid var(--line);
+  }
+  .ticker-group span b{ color: var(--ash); font-weight: 500; }
+  .ticker-group span .tri{
+    color: var(--siren);
+    font-size: 10px;
+    flex-shrink:0;
+  }
+  .dot{ display:inline-block; width:6px; height:6px; border-radius:50%; flex-shrink:0; }
+  .dot.rift{ background: var(--rift); }
+  .dot.corrosion{ background: var(--corrosion); }
+  .dot.warp{ background: var(--warp); }
+
+  @keyframes scroll-left{
+    from{ transform: translateX(0); }
+    to{ transform: translateX(-50%); }
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    .ticker-track{ animation: none; }
+  }
+
+  /* ---------- hero ---------- */
+  .hero{
+    min-height: 100vh;
+    display:flex; flex-direction:column; justify-content:center;
+    padding: 140px 32px 80px;
+    max-width: 1180px; margin: 0 auto;
+    position: relative;
+  }
+  .hero .eyebrow{
+    font-family:'IBM Plex Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--siren);
+    margin-bottom: 22px;
+  }
+  .hero h1{
+    font-size: clamp(64px, 13vw, 168px);
+    color: var(--ash);
+  }
+  .hero h1 em{
+    font-style: normal;
+    color: var(--ash-dim);
+  }
+  .hero .subtitle{
+    font-family: 'Newsreader', serif;
+    font-style: italic;
+    font-size: clamp(20px, 3vw, 30px);
+    color: var(--ash-dim);
+    margin-top: 18px;
+    max-width: 640px;
+  }
+  .hero .lede{
+    margin-top: 36px;
+    max-width: 560px;
+    color: var(--ash-dim);
+    font-size: 16px;
+  }
+  .scroll-cue{
+    position:absolute; bottom: 40px; left: 32px;
+    font-family:'IBM Plex Mono', monospace;
+    font-size: 11px; letter-spacing: 0.1em;
+    color: var(--ash-dim);
+    display:flex; align-items:center; gap:10px;
+  }
+  .scroll-cue .line{
+    width: 40px; height:1px; background: var(--ash-dim);
+    animation: pulse-line 2.4s ease-in-out infinite;
+  }
+  @keyframes pulse-line{
+    0%,100%{ opacity: 0.3; } 50%{ opacity: 1; }
+  }
+
+  /* ---------- section shell ---------- */
+  section{
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 120px 32px;
+    border-top: 1px solid var(--line);
+  }
+  .section-head{
+    display:flex; justify-content:space-between; align-items:flex-end;
+    gap: 24px; flex-wrap: wrap;
+    margin-bottom: 56px;
+  }
+  .section-head .code{
+    font-family:'IBM Plex Mono', monospace;
+    font-size: 12px; letter-spacing:0.14em;
+    color: var(--siren);
+    margin-bottom: 12px;
+    display:block;
+  }
+  .section-head h2{
+    font-size: clamp(38px, 6vw, 64px);
+    color: var(--ash);
+  }
+
+  /* per-section signature typefaces (Korean-supporting) */
+  #collapse .section-head h2{
+    font-family: 'Black Han Sans', sans-serif;
+    letter-spacing: 0.01em;
+  }
+  #factions .section-head h2{
+    font-family: 'Nanum Myeongjo', serif;
+    font-weight: 800;
+    letter-spacing: 0;
+  }
+  #abilities .section-head h2{
+    font-family: 'Gugi', sans-serif;
+    font-size: clamp(28px, 4.6vw, 46px);
+    letter-spacing: 0.01em;
+    line-height: 1.3;
+  }
+  #zones .section-head h2{
+    font-family: 'Sunflower', sans-serif;
+    font-weight: 700;
+    letter-spacing: 0.01em;
+  }
+  #cast .section-head h2{
+    font-family: 'Song Myung', serif;
+    letter-spacing: 0;
+  }
+  .section-head .note{
+    font-family:'IBM Plex Mono', monospace;
+    font-size: 12px;
+    color: var(--ash-dim);
+    max-width: 260px;
+    text-align: right;
+  }
+  @media (max-width: 640px){
+    .section-head .note{ text-align:left; }
+  }
+
+  /* ---------- collapse types ---------- */
+  .collapse-grid{
+    display:grid; grid-template-columns: repeat(3, 1fr); gap: 1px;
+    background: var(--line);
+    border: 1px solid var(--line);
+  }
+  @media (max-width: 860px){ .collapse-grid{ grid-template-columns: 1fr; } }
+  .collapse-card{
+    background: var(--surface);
+    padding: 40px 28px;
+    position: relative;
+  }
+  .collapse-card .tag{
+    font-family:'IBM Plex Mono', monospace;
+    font-size: 11px; letter-spacing: 0.12em; text-transform:uppercase;
+    display:flex; align-items:center; margin-bottom: 26px;
+  }
+  .collapse-card h3{
+    font-size: 34px; margin-bottom: 16px; color: var(--ash);
+  }
+  .collapse-card p{
+    color: var(--ash-dim); font-size: 15px; margin-bottom: 20px;
+  }
+  .collapse-card .bar{
+    height: 3px; width: 100%; background: var(--surface-2); position: relative; overflow:hidden; margin-bottom: 18px;
+  }
+  .collapse-card .bar i{
+    position:absolute; left:0; top:0; bottom:0; display:block;
+  }
+  .collapse-card.rift .bar i{ background: var(--rift); width: 38%; }
+  .collapse-card.corrosion .bar i{ background: var(--corrosion); width: 61%; }
+  .collapse-card.warp .bar i{ background: var(--warp); width: 22%; }
+  .placeholder-note{
+    font-family:'IBM Plex Mono', monospace;
+    font-size: 11px; color: var(--ash-dim);
+    border-top: 1px dashed var(--line);
+    padding-top: 14px;
+  }
+
+  /* ---------- factions ---------- */
+  .faction-list{ display:flex; flex-direction:column; }
+  .faction-row{
+    display:grid; grid-template-columns: 100px 220px 1fr 140px;
+    gap: 24px;
+    align-items: center;
+    padding: 28px 0;
+    border-top: 1px solid var(--line);
+  }
+  .faction-list .faction-row:last-child{ border-bottom: 1px solid var(--line); }
+  @media (max-width: 760px){
+    .faction-row{ grid-template-columns: 1fr; gap: 8px; padding: 22px 0; }
+  }
+  .faction-row .num{
+    font-family:'IBM Plex Mono', monospace;
+    color: var(--ash-dim); font-size: 12px;
+  }
+  .faction-row h3{
+    font-size: 26px; color: var(--ash); letter-spacing: 0.01em;
+  }
+  .faction-row .desc{ color: var(--ash-dim); font-size: 14px; }
+  .faction-row .status{
+    font-family:'IBM Plex Mono', monospace;
+    font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase;
+    color: var(--ash-dim);
+    justify-self: end;
+  }
+  @media (max-width: 760px){ .faction-row .status{ justify-self: start; } }
+
+  /* ---------- abilities ---------- */
+  .ability-formula{
+    display:flex; align-items:center; gap: 18px; flex-wrap: wrap;
+    margin-bottom: 48px;
+  }
+  .ability-formula .chip{
+    font-family:'IBM Plex Mono', monospace;
+    font-size: 13px;
+    border: 1px solid var(--line);
+    padding: 10px 18px;
+    color: var(--ash);
+  }
+  .ability-formula .op{ color: var(--ash-dim); font-family:'IBM Plex Mono', monospace; }
+  .axis-grid{ display:grid; grid-template-columns: repeat(3, 1fr); gap: 32px; }
+  @media (max-width: 860px){ .axis-grid{ grid-template-columns: 1fr; } }
+  .axis-grid .axis .label{
+    font-family:'IBM Plex Mono', monospace; font-size: 11px; color: var(--siren);
+    letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 12px; display:block;
+  }
+  .axis-grid .axis ul{ list-style:none; }
+  .axis-grid .axis li{
+    padding: 10px 0; border-top: 1px solid var(--line);
+    color: var(--ash-dim); font-size: 15px;
+  }
+
+  /* ---------- zones ---------- */
+  .zone-map{ display:grid; grid-template-columns: repeat(5, 1fr); gap: 1px; background: var(--line); border: 1px solid var(--line); }
+  @media (max-width: 900px){ .zone-map{ grid-template-columns: 1fr 1fr; } }
+  @media (max-width: 520px){ .zone-map{ grid-template-columns: 1fr; } }
+  .zone{
+    background: var(--surface); padding: 28px 20px; min-height: 180px;
+    display:flex; flex-direction:column; justify-content:space-between;
+  }
+  .zone .zn{ font-family:'IBM Plex Mono', monospace; font-size: 34px; color: var(--ash-dim); }
+  .zone h4{ font-family:'Bebas Neue',sans-serif; font-size: 22px; color: var(--ash); letter-spacing:0.02em; }
+  .zone p{ font-size: 13px; color: var(--ash-dim); }
+
+  /* ---------- characters (placeholder) ---------- */
+  .cast-shell{
+    border: 1px dashed var(--line);
+    padding: 60px 32px;
+    text-align: center;
+  }
+  .cast-shell .count{
+    font-family:'Bebas Neue', sans-serif;
+    font-size: 96px;
+    color: var(--ash-dim);
+  }
+  .cast-shell p{ color: var(--ash-dim); font-family:'IBM Plex Mono', monospace; font-size: 13px; margin-top: 8px; }
+  .cast-grid{
+    display:grid; grid-template-columns: repeat(7, 1fr); gap: 8px; margin-top: 36px;
+  }
+  @media (max-width: 760px){ .cast-grid{ grid-template-columns: repeat(4, 1fr); } }
+  .cast-grid .slot{
+    aspect-ratio: 3/4;
+    border: 1px solid var(--line);
+    display:flex; align-items:center; justify-content:center;
+    font-family:'IBM Plex Mono', monospace;
+    font-size: 11px; color: var(--line);
+  }
+
+  /* ---------- footer ---------- */
+  footer{
+    max-width: 1180px; margin: 0 auto;
+    padding: 60px 32px 80px;
+    display:flex; justify-content:space-between; align-items:center;
+    flex-wrap: wrap; gap: 20px;
+    border-top: 1px solid var(--line);
+  }
+  footer .brand{ font-family:'Bebas Neue', sans-serif; font-size: 18px; letter-spacing: 0.1em; color: var(--ash-dim); }
+  footer .meta{ font-family:'IBM Plex Mono', monospace; font-size: 11px; color: var(--ash-dim); }
+
+  /* ---------- boot gate (tablet device) — pure CSS, no JS required ---------- */
+  #power-toggle{
+    position: absolute;
+    width: 1px; height: 1px;
+    opacity: 0; pointer-events: none;
+  }
+
+  #boot-overlay{
+    position: fixed; inset: 0; z-index: 999;
+    height: 100vh;
+    background: #05060A;
+    display:flex; align-items:center; justify-content:center;
+    padding: 32px;
+    transition: opacity 0.45s ease 1.25s, visibility 0.45s ease 1.25s;
+  }
+  #boot-overlay:has(#power-toggle:checked){
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+  }
+
+  .device{
+    width: min(720px, 100%);
+    aspect-ratio: 4/3;
+    background: #0D0F14;
+    border-radius: 22px;
+    padding: 22px;
+    box-shadow: 0 0 0 1px #1D212B, 0 40px 100px rgba(0,0,0,0.6);
+    display:flex; flex-direction:column;
+  }
+  #boot-overlay:has(#power-toggle:checked) .device{
+    animation: crt-off 0.5s ease 0.7s forwards;
+  }
+  @keyframes crt-off{
+    0%{ filter: brightness(1); }
+    55%{ filter: brightness(2.6); }
+    100%{ filter: brightness(0); transform: scaleY(0.02); }
+  }
+
+  .device .cam{
+    width: 6px; height:6px; border-radius:50%;
+    background: #2A303C; margin: 0 auto 14px;
+  }
+  .screen{
+    position: relative;
+    flex:1;
+    background: #060709;
+    border-radius: 6px;
+    overflow: hidden;
+    display:flex; align-items:center; justify-content:center;
+    box-shadow: inset 0 0 40px rgba(0,0,0,0.8);
+  }
+
+  /* CSS-only static noise, built from an inline SVG turbulence filter (no JS, no network) */
+  .static-noise{
+    position:absolute; inset: -20%;
+    width: 140%; height: 140%;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+    background-size: 220px 220px;
+    opacity: 0;
+    mix-blend-mode: screen;
+  }
+  #boot-overlay:has(#power-toggle:checked) .static-noise{
+    animation: static-flicker 0.7s steps(2) 1 forwards;
+  }
+  @keyframes static-flicker{
+    0%{ opacity: 0; background-position: 0 0; }
+    8%{ opacity: 0.9; background-position: 40px 10px; }
+    20%{ opacity: 0.15; background-position: -30px 60px; }
+    30%{ opacity: 1; background-position: 90px -20px; }
+    45%{ opacity: 0.1; background-position: -60px 30px; }
+    60%{ opacity: 0.85; background-position: 20px -50px; }
+    75%{ opacity: 0.15; background-position: -80px 15px; }
+    100%{ opacity: 0; background-position: 0 0; }
+  }
+
+  .screen .scanlines{
+    position:absolute; inset:0;
+    background: repeating-linear-gradient(
+      to bottom, rgba(255,255,255,0.035) 0px, rgba(255,255,255,0.035) 1px,
+      transparent 1px, transparent 3px
+    );
+    pointer-events:none;
+  }
+  .screen .vignette{
+    position:absolute; inset:0;
+    box-shadow: inset 0 0 90px 20px rgba(0,0,0,0.85);
+    pointer-events:none;
+  }
+  #boot-overlay:has(#power-toggle:checked) .scanlines,
+  #boot-overlay:has(#power-toggle:checked) .vignette{
+    animation: fade-out-quick 0.15s ease forwards;
+  }
+  @keyframes fade-out-quick{ to{ opacity: 0; } }
+
+  .screen-content{
+    position: relative; z-index: 2;
+    text-align:center;
+    padding: 24px;
+  }
+  #boot-overlay:has(#power-toggle:checked) .screen-content{
+    animation: content-flicker 0.7s steps(2) 1 forwards;
+  }
+  @keyframes content-flicker{
+    0%{ opacity: 1; }
+    10%{ opacity: 0; }
+    22%{ opacity: 1; transform: translateX(-2px); }
+    35%{ opacity: 0; }
+    50%{ opacity: 1; transform: translateX(2px); }
+    65%{ opacity: 0.2; }
+    80%{ opacity: 1; }
+    100%{ opacity: 0; }
+  }
+
+  .screen-content .sys{
+    font-family:'IBM Plex Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    color: #4E5666;
+    margin-bottom: 26px;
+  }
+  .screen-content .sys span{ color: var(--corrosion); }
+  .screen-content h2{
+    font-family:'Bebas Neue', sans-serif;
+    font-size: clamp(30px, 6vw, 46px);
+    color: #C7CBD4;
+    letter-spacing: 0.04em;
+    margin-bottom: 10px;
+  }
+  .screen-content p{
+    font-family:'IBM Plex Mono', monospace;
+    font-size: 12px;
+    color: #6A7180;
+    margin-bottom: 30px;
+  }
+  label#confirm-btn{
+    font-family:'IBM Plex Mono', monospace;
+    font-size: 13px;
+    letter-spacing: 0.1em;
+    color: #C7CBD4;
+    background: transparent;
+    border: 1px solid #3A4150;
+    padding: 14px 34px;
+    cursor: pointer;
+    display: inline-block;
+    transition: border-color 0.2s ease, color 0.2s ease, background 0.2s ease;
+  }
+  label#confirm-btn:hover{
+    border-color: var(--siren); color: var(--siren);
+  }
+  #power-toggle:focus-visible + .device label#confirm-btn,
+  #power-toggle:focus + .device label#confirm-btn{
+    border-color: var(--siren); color: var(--siren); outline: none;
+  }
+  .cursor-blink{
+    display:inline-block; width:7px; height:13px; background:#4E5666;
+    margin-left:4px; vertical-align:-2px;
+    animation: blink 1s step-end infinite;
+  }
+  @keyframes blink{ 50%{ opacity:0; } }
+
+  @media (prefers-reduced-motion: reduce){
+    #boot-overlay:has(#power-toggle:checked) .static-noise,
+    #boot-overlay:has(#power-toggle:checked) .screen-content,
+    #boot-overlay:has(#power-toggle:checked) .device{
+      animation: none !important;
+    }
+    #boot-overlay:has(#power-toggle:checked){ opacity: 0; visibility: hidden; transition: opacity 0.3s ease; }
+  }
+
+  /* ---------- site power-on reveal (flash + curtains open from center) ---------- */
+  #crt-reveal{
+    position: fixed; inset: 0; z-index: 500;
+    pointer-events: none;
+  }
+  #crt-reveal .curtain{
+    position: absolute; left:0; right:0; height: 50%;
+    background: var(--bg);
+  }
+  #crt-reveal .curtain.top{ top: 0; transform-origin: top; }
+  #crt-reveal .curtain.bottom{ bottom: 0; transform-origin: bottom; }
+  #crt-reveal .flash-line{
+    position: absolute; left:0; right:0; top: 50%;
+    height: 2px;
+    background: #F4F1EA;
+    box-shadow: 0 0 60px 14px rgba(244,241,234,0.9);
+    opacity: 0;
+    transform: translateY(-50%);
+  }
+  #crt-reveal .flash-full{
+    position:absolute; inset:0;
+    background: #F4F1EA;
+    opacity: 0;
+  }
+
+  body:has(#power-toggle:checked) #crt-reveal .flash-full{
+    animation: power-flash 0.4s ease 1.6s forwards;
+  }
+  body:has(#power-toggle:checked) #crt-reveal .flash-line{
+    animation: line-flash 0.5s ease 1.55s forwards;
+  }
+  body:has(#power-toggle:checked) #crt-reveal .curtain.top,
+  body:has(#power-toggle:checked) #crt-reveal .curtain.bottom{
+    animation: curtain-open 0.65s cubic-bezier(0.16, 1, 0.3, 1) 1.75s forwards;
+  }
+
+  @keyframes power-flash{
+    0%{ opacity: 0; }
+    12%{ opacity: 0.95; }
+    35%{ opacity: 0.25; }
+    100%{ opacity: 0; }
+  }
+  @keyframes line-flash{
+    0%{ opacity: 0; height: 2px; }
+    30%{ opacity: 1; height: 3px; }
+    60%{ opacity: 1; height: 3px; }
+    100%{ opacity: 0; height: 3px; }
+  }
+  @keyframes curtain-open{
+    from{ transform: scaleY(1); }
+    to{ transform: scaleY(0); }
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    body:has(#power-toggle:checked) #crt-reveal .flash-full,
+    body:has(#power-toggle:checked) #crt-reveal .flash-line{
+      animation: none !important; opacity: 0 !important;
+    }
+    body:has(#power-toggle:checked) #crt-reveal .curtain{
+      animation: none !important; transform: scaleY(0) !important;
+      transition: transform 0.3s ease 1.25s;
+    }
+  }
+</style>
+</head>
+<body>
+
+<div id="boot-overlay">
+  <input type="checkbox" id="power-toggle">
+  <div class="device">
+    <div class="cam"></div>
+    <div class="screen" id="screen">
+      <div class="static-noise"></div>
+      <div class="scanlines"></div>
+      <div class="vignette"></div>
+      <div class="screen-content">
+        <div class="sys">TERMINAL <span>OMB-091</span> · ACCESS REQUEST</div>
+        <h2>OBLIVIA 기록 보관소</h2>
+        <p>이 기록은 붕괴 진행 중인 도시의 관측 자료를 포함합니다<span class="cursor-blink"></span></p>
+        <label for="power-toggle" id="confirm-btn">확인하시겠습니까?</label>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="crt-reveal" aria-hidden="true">
+  <div class="curtain top"></div>
+  <div class="curtain bottom"></div>
+  <div class="flash-line"></div>
+  <div class="flash-full"></div>
+</div>
+
+<nav>
+  <div class="brand">OBLIVIA<span>.</span></div>
+  <ul>
+    <li><a href="#collapse">붕괴</a></li>
+    <li><a href="#factions">조직</a></li>
+    <li><a href="#abilities">이능력</a></li>
+    <li><a href="#zones">구역</a></li>
+    <li><a href="#cast">인물</a></li>
+  </ul>
+  <button class="toggle" aria-label="메뉴">≡</button>
+</nav>
+
+<div class="ticker-bar" aria-hidden="true">
+  <div class="row">
+    <div class="alert-tag">
+      <span class="pulse-dot"></span>
+      <span class="label">경보</span>
+    </div>
+    <div class="ticker-viewport">
+      <div class="ticker-track">
+        <div class="ticker-group">
+          <span><i class="dot rift"></i>RIFT — <b> 균열 감시 중</b></span>
+          <span><i class="dot corrosion"></i>CORROSION — <b>4구역 경계선 확산</b></span>
+          <span><i class="dot warp"></i>WARP — <b>미확인 왜곡 발생 보고</b></span>
+          <span class="mono">CITY STATUS — <b>붕괴 진행 중</b></span>
+        </div>
+        <div class="ticker-group" aria-hidden="true">
+          <span><i class="dot rift"></i>RIFT — <b> 균열 감시 중</b></span>
+          <span><i class="dot corrosion"></i>CORROSION — <b>4구역 경계선 확산</b></span>
+          <span><i class="dot warp"></i>WARP — <b>미확인 왜곡 발생 보고</b></span>
+          <span class="mono">CITY STATUS — <b>붕괴 진행 중</b></span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<header class="hero">
+  <span class="eyebrow">Urban Fantasy World · Collapse In Progress</span>
+  <h1>OBLIVI<em>A</em></h1>
+  <p class="subtitle">망각의 균열 속에서</p>
+  <p class="lede">
+    도시는 아직 무너지는 중이다. 균열이 열리고, 잠식이 번지고, 공간의 법칙이 뒤틀린다.<br>
+    막아내는 사람들이 있고, 그걸 당연하게 여기는 사람들이 있다.<br>— 이곳은 그 경계에 선 이들의 기록이다.
+  </p>
+  <div class="scroll-cue"><div class="line"></div>SCROLL</div>
+</header>
+
+<section id="collapse">
+  <div class="section-head">
+    <div>
+      <span class="code">01 · PHENOMENON</span>
+      <h2>붕괴의 세 형태</h2>
+    </div>
+    <p class="note">균열형·잠식형·왜곡형은 서로 독립적으로 발생한다. 상세 세부 룰은 추후 업데이트 예정.</p>
+  </div>
+
+  <div class="collapse-grid">
+    <div class="collapse-card rift">
+      <span class="tag"><i class="dot rift"></i>RIFT</span>
+      <h3>균열형</h3>
+      <div class="bar"><i></i></div>
+      <p>특정 지점에 물리적 틈이 생기고, 그 너머에서 오염체가 새어나온다. 방치하면 균열이 커진다.</p>
+      <div class="placeholder-note">세부 항목 · 추후 추가</div>
+    </div>
+    <div class="collapse-card corrosion">
+      <span class="tag"><i class="dot corrosion"></i>CORROSION</span>
+      <h3>잠식형</h3>
+      <div class="bar"><i></i></div>
+      <p>경계 없이 서서히 공간이 오염되며 확산된다. 오래 노출되면 사람도 서서히 변이한다.</p>
+      <div class="placeholder-note">세부 항목 · 추후 추가</div>
+    </div>
+    <div class="collapse-card warp">
+      <span class="tag"><i class="dot warp"></i>WARP</span>
+      <h3>왜곡형</h3>
+      <div class="bar"><i></i></div>
+      <p>방향·거리·시간 같은 공간의 법칙 자체가 어긋난다. 갇히거나, 엉뚱한 곳으로 나오게 된다.</p>
+      <div class="placeholder-note">세부 항목 · 추후 추가</div>
+    </div>
+  </div>
+</section>
+
+<section id="factions">
+  <div class="section-head">
+    <div>
+      <span class="code">02 · POWERS</span>
+      <h2>이능력자 조직</h2>
+    </div>
+    <p class="note">4개 조직 + 개인 세력 2~3명. 개인 세력은 추후 추가.</p>
+  </div>
+
+  <div class="faction-list">
+    <div class="faction-row">
+      <span class="num mono">01</span>
+      <h3>OMB</h3>
+      <span class="desc">정부 소속 공식 기관. 관료적이고 규율 중심적이며, 예산과 권한은 크지만 절차가 느리다.</span>
+      <span class="status mono">— 상세 준비 중</span>
+    </div>
+    <div class="faction-row">
+      <span class="num mono">02</span>
+      <h3>루멘타 <span class="mono" style="font-size:12px;color:var(--ash-dim)">LUMENTA</span></h3>
+      <span class="desc">대가 없이 돕는 자경단. 시민들에게는 신뢰받지만, 정부와는 대립각을 세운다.</span>
+      <span class="status mono">— 상세 준비 중</span>
+    </div>
+    <div class="faction-row">
+      <span class="num mono">03</span>
+      <h3>테네브라 <span class="mono" style="font-size:12px;color:var(--ash-dim)">TENEBRA</span></h3>
+      <span class="desc">종교·신앙 계열 단체. 붕괴를 신벌 혹은 정화로 해석하며, 독자적인 동기로 움직인다.</span>
+      <span class="status mono">— 상세 준비 중</span>
+    </div>
+    <div class="faction-row">
+      <span class="num mono">04</span>
+      <h3>카르시아 <span class="mono" style="font-size:12px;color:var(--ash-dim)">KARSIA</span></h3>
+      <span class="desc">언더그라운드 조직. 오염체·이능력 관련 암시장과 불법 실험에 관여한다.</span>
+      <span class="status mono">— 상세 준비 중</span>
+    </div>
+  </div>
+</section>
+
+<section id="abilities">
+  <div class="section-head">
+    <div>
+      <span class="code">03 · AWAKENING</span>
+      <h2>이능력 체계</h2>
+    </div>
+    <p class="note">선천적 소질 + 후천적 트리거(오염 노출). 판별 불가, 각성자 비율 인구 1%.</p>
+  </div>
+
+  <div class="ability-formula">
+    <span class="chip">특성 (3)</span><span class="op">×</span>
+    <span class="chip">무기 (3)</span><span class="op">×</span>
+    <span class="chip">속성 (6)</span><span class="op">=</span>
+    <span class="chip" style="color:var(--siren); border-color:var(--siren);">54 조합</span>
+  </div>
+
+  <div class="axis-grid">
+    <div class="axis">
+      <span class="label">특성 · Role</span>
+      <ul>
+        <li>공격형</li>
+        <li>방어형</li>
+        <li>지원형</li>
+      </ul>
+    </div>
+    <div class="axis">
+      <span class="label">무기 · Form</span>
+      <ul>
+        <li>근접무기형</li>
+        <li>원거리무기형</li>
+        <li>무형매개형</li>
+      </ul>
+    </div>
+    <div class="axis">
+      <span class="label">속성 · Nature</span>
+      <ul>
+        <li>이성 ↔ 감정</li>
+        <li>진실 ↔ 환상</li>
+        <li>질서 ↔ 혼돈</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section id="zones">
+  <div class="section-head">
+    <div>
+      <span class="code">04 · CITY</span>
+      <h2>OBLIVIA, 1~5섹터</h2>
+    </div>
+    <p class="note">붕괴는 구역과 무관하게 어디서든 발생할 수 있다.</p>
+  </div>
+
+  <div class="zone-map">
+    <div class="zone">
+      <span class="zn">01</span>
+      <div><h4>도심 / 번화가</h4><p>행정·상업 중심지. OMB 본부 소재.</p></div>
+    </div>
+    <div class="zone">
+      <span class="zn">02</span>
+      <div><h4>주거지역</h4><p>일반 시민 생활권.</p></div>
+    </div>
+    <div class="zone">
+      <span class="zn">03</span>
+      <div><h4>구시가지</h4><p>낙후지역. 루멘타 거점.</p></div>
+    </div>
+    <div class="zone">
+      <span class="zn">04</span>
+      <div><h4>산업 / 항만</h4><p>회색지대. 카르시아 거점.</p></div>
+    </div>
+    <div class="zone">
+      <span class="zn">05</span>
+      <div><h4>외곽 / 변두리</h4><p>테네브라 거점.</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="cast">
+  <div class="section-head">
+    <div>
+      <span class="code">05 · CAST</span>
+      <h2>인물</h2>
+    </div>
+    <p class="note">21명 예정. 세부 프로필은 추후 채워집니다.</p>
+  </div>
+
+  <div class="cast-shell">
+    <div class="count">21</div>
+    <p>CHARACTERS · IN PROGRESS</p>
+    <div class="cast-grid">
+      <div class="slot">?</div><div class="slot">?</div><div class="slot">?</div><div class="slot">?</div>
+      <div class="slot">?</div><div class="slot">?</div><div class="slot">?</div><div class="slot">?</div>
+      <div class="slot">?</div><div class="slot">?</div><div class="slot">?</div><div class="slot">?</div>
+      <div class="slot">?</div><div class="slot">?</div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="brand">OBLIVIA</div>
+  <div class="meta">망각의 균열 속에서 · WORLD DRAFT · SKELETON BUILD</div>
+</footer>
+
+</body>
+</html>
