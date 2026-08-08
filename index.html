@@ -246,34 +246,10 @@
     display:block;
   }
   .section-head h2{
+    font-family: 'Song Myung', serif;
     font-size: clamp(38px, 6vw, 64px);
     color: var(--ash);
-  }
-
-  /* per-section signature typefaces (Korean-supporting) */
-  #collapse .section-head h2{
-    font-family: 'Black Han Sans', sans-serif;
     letter-spacing: 0.01em;
-  }
-  #factions .section-head h2{
-    font-family: 'Nanum Myeongjo', serif;
-    font-weight: 800;
-    letter-spacing: 0;
-  }
-  #abilities .section-head h2{
-    font-family: 'Gugi', sans-serif;
-    font-size: clamp(28px, 4.6vw, 46px);
-    letter-spacing: 0.01em;
-    line-height: 1.3;
-  }
-  #zones .section-head h2{
-    font-family: 'Sunflower', sans-serif;
-    font-weight: 700;
-    letter-spacing: 0.01em;
-  }
-  #cast .section-head h2{
-    font-family: 'Song Myung', serif;
-    letter-spacing: 0;
   }
   .section-head .note{
     font-family:'IBM Plex Mono', monospace;
@@ -297,14 +273,65 @@
     background: var(--surface);
     padding: 40px 28px;
     position: relative;
+    overflow: hidden;
+    cursor: pointer;
+    isolation: isolate;
+    transition: transform 0.25s ease, box-shadow 0.25s ease, background 0.25s ease;
   }
+  .collapse-card:hover, .collapse-card:focus-visible{
+    transform: translateY(-6px);
+    background: var(--surface-2);
+    box-shadow: 0 18px 40px rgba(0,0,0,0.5);
+    outline: none;
+  }
+  .collapse-card:hover .crack-bg, .collapse-card:focus-visible .crack-bg{ opacity: 0.85; }
+  .collapse-card::after{
+    content: "";
+    position: absolute; inset: 0;
+    border: 1px solid transparent;
+    transition: border-color 0.25s ease;
+    pointer-events: none;
+    z-index: 3;
+  }
+  .collapse-card.rift:hover::after, .collapse-card.rift:focus-visible::after{ border-color: var(--rift); }
+  .collapse-card.corrosion:hover::after, .collapse-card.corrosion:focus-visible::after{ border-color: var(--corrosion); }
+  .collapse-card.warp:hover::after, .collapse-card.warp:focus-visible::after{ border-color: var(--warp); }
+
+  .collapse-card .crack-bg{
+    position:absolute; inset: -10%;
+    width: 120%; height: 120%;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg'><filter id='c'><feTurbulence type='turbulence' baseFrequency='0.012 0.06' numOctaves='3' seed='7' result='n'/><feDisplacementMap in='SourceGraphic' in2='n' scale='40'/></filter><rect width='100%25' height='100%25' fill='white' filter='url(%23c)'/></svg>");
+    background-size: 260px 260px;
+    opacity: 0.55;
+    mix-blend-mode: overlay;
+    transition: opacity 0.25s ease;
+    z-index: 0;
+  }
+  .collapse-card .crack-tint{
+    position:absolute; inset:0;
+    mix-blend-mode: color;
+    opacity: 0.9;
+    z-index: 0;
+  }
+  .collapse-card.rift .crack-tint{ background: var(--rift); }
+  .collapse-card.corrosion .crack-tint{ background: var(--corrosion); }
+  .collapse-card.warp .crack-tint{ background: var(--warp); }
+  .collapse-card .crack-fade{
+    position:absolute; inset:0;
+    background: linear-gradient(135deg, transparent 0%, transparent 30%, var(--surface) 78%);
+    z-index: 1;
+  }
+  .collapse-card > *:not(.crack-bg):not(.crack-tint):not(.crack-fade){
+    position: relative; z-index: 2;
+  }
+
   .collapse-card .tag{
     font-family:'IBM Plex Mono', monospace;
     font-size: 11px; letter-spacing: 0.12em; text-transform:uppercase;
     display:flex; align-items:center; gap: 10px; margin-bottom: 26px;
   }
   .collapse-card h3{
-    font-family: 'Black Han Sans', sans-serif;
+    font-family: 'Song Myung', serif;
     font-size: 34px; margin-bottom: 16px; color: var(--ash);
   }
   .collapse-card p{
@@ -319,6 +346,16 @@
   .collapse-card.rift .bar i{ background: var(--rift); width: 38%; }
   .collapse-card.corrosion .bar i{ background: var(--corrosion); width: 61%; }
   .collapse-card.warp .bar i{ background: var(--warp); width: 22%; }
+  .collapse-card .tap-hint{
+    font-family:'IBM Plex Mono', monospace;
+    font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--ash-dim);
+    opacity: 0; transform: translateY(4px);
+    transition: opacity 0.25s ease, transform 0.25s ease;
+  }
+  .collapse-card:hover .tap-hint, .collapse-card:focus-visible .tap-hint{
+    opacity: 1; transform: translateY(0);
+  }
   .placeholder-note{
     font-family:'IBM Plex Mono', monospace;
     font-size: 11px; color: var(--ash-dim);
@@ -344,8 +381,7 @@
     color: var(--ash-dim); font-size: 12px;
   }
   .faction-row h3{
-    font-family: 'Nanum Myeongjo', serif;
-    font-weight: 800;
+    font-family: 'Song Myung', serif;
     font-size: 26px; color: var(--ash); letter-spacing: 0.01em;
   }
   .faction-row .desc{ color: var(--ash-dim); font-size: 14px; }
@@ -363,7 +399,7 @@
     margin-bottom: 48px;
   }
   .ability-formula .chip{
-    font-family:'IBM Plex Mono', monospace;
+    font-family:'Song Myung', serif;
     font-size: 13px;
     border: 1px solid var(--line);
     padding: 10px 18px;
@@ -378,8 +414,9 @@
   }
   .axis-grid .axis ul{ list-style:none; }
   .axis-grid .axis li{
+    font-family: 'Song Myung', serif;
     padding: 10px 0; border-top: 1px solid var(--line);
-    color: var(--ash-dim); font-size: 15px;
+    color: var(--ash-dim); font-size: 14px;
   }
 
   /* ---------- zones ---------- */
@@ -391,7 +428,7 @@
     display:flex; flex-direction:column; justify-content:space-between;
   }
   .zone .zn{ font-family:'IBM Plex Mono', monospace; font-size: 34px; color: var(--ash-dim); }
-  .zone h4{ font-family:'Sunflower', sans-serif; font-weight:700; font-size: 22px; color: var(--ash); letter-spacing:0.02em; }
+  .zone h4{ font-family:'Song Myung', serif; font-size: 22px; color: var(--ash); letter-spacing:0.02em; }
   .zone p{ font-size: 13px; color: var(--ash-dim); }
 
   /* ---------- characters (placeholder) ---------- */
@@ -401,7 +438,7 @@
     text-align: center;
   }
   .cast-shell .count{
-    font-family:'Bebas Neue', sans-serif;
+    font-family:'Song Myung', serif;
     font-size: 96px;
     color: var(--ash-dim);
   }
@@ -681,6 +718,332 @@
       transition: transform 0.3s ease 1.25s;
     }
   }
+
+  /* ---------- location modal ---------- */
+  .modal-overlay{
+    position: fixed; inset: 0; z-index: 800;
+    display:flex; align-items:center; justify-content:center;
+    padding: 24px;
+    background: rgba(5,6,10,0);
+    opacity: 0; pointer-events: none;
+    transition: opacity 0.3s ease, background 0.3s ease;
+  }
+  .modal-overlay.open{
+    opacity: 1; pointer-events: auto;
+    background: rgba(5,6,10,0.78);
+  }
+  .modal-panel{
+    position: relative;
+    isolation: isolate;
+    width: min(1180px, 96%);
+    max-height: 88vh;
+    overflow-y: auto;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 18px;
+    padding: 28px 40px 64px;
+    transform: scale(0.94) translateY(14px);
+    opacity: 0;
+    transition: transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.3s ease;
+  }
+  .modal-overlay.open .modal-panel{ transform: scale(1) translateY(0); opacity: 1; }
+  .modal-panel.closing{
+    overflow: hidden;
+    background: transparent;
+    border-color: transparent;
+    box-shadow: none;
+    transition: background 0.1s ease, border-color 0.1s ease;
+  }
+
+  .modal-panel .modal-accent{
+    position:absolute; top:0; left:0; right:0; height: 4px;
+    border-radius: 18px 18px 0 0;
+  }
+  .modal-panel.rift .modal-accent{ background: var(--rift); }
+  .modal-panel.corrosion .modal-accent{ background: var(--corrosion); }
+  .modal-panel.warp .modal-accent{ background: var(--warp); }
+
+  .modal-close{
+    position: absolute; top: 22px; right: 22px;
+    width: 36px; height: 36px;
+    display:flex; align-items:center; justify-content:center;
+    background: transparent;
+    border: 1px solid var(--line);
+    color: var(--ash-dim);
+    font-family:'IBM Plex Mono', monospace; font-size: 16px;
+    cursor: pointer;
+    z-index: 4;
+    transition: border-color 0.2s ease, color 0.2s ease;
+  }
+  .modal-close:hover{ border-color: var(--siren); color: var(--siren); }
+
+  /* ---- two-column info layout ---- */
+  .modal-grid{
+    display:grid;
+    grid-template-columns: minmax(240px, 300px) 1fr;
+    gap: 32px;
+  }
+  @media (max-width: 760px){
+    .modal-grid{ grid-template-columns: 1fr; }
+  }
+
+  .modal-eyebrow{
+    display:flex; align-items:center; gap: 8px;
+    font-family:'IBM Plex Mono', monospace;
+    font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase;
+    color: var(--ash-dim);
+    margin-bottom: 12px;
+  }
+  .modal-eyebrow .bar{ width: 2px; height: 14px; }
+  .modal-panel.rift .modal-eyebrow .bar{ background: var(--rift); }
+  .modal-panel.corrosion .modal-eyebrow .bar{ background: var(--corrosion); }
+  .modal-panel.warp .modal-eyebrow .bar{ background: var(--warp); }
+
+  .modal-title-block h3{
+    font-family: 'Song Myung', serif;
+    font-size: 32px;
+    color: var(--ash);
+    margin-bottom: 4px;
+  }
+  .modal-title-block .en{
+    font-family:'IBM Plex Mono', monospace;
+    font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--ash-dim);
+    margin-bottom: 16px;
+  }
+  .modal-desc p{
+    font-size: 13px; color: var(--ash-dim);
+    margin-bottom: 8px; line-height: 1.6;
+  }
+
+  .modal-stats{ margin-top: 16px; display:flex; flex-direction:column; gap: 7px; }
+  .modal-stats .stat{
+    display:flex; align-items:center; justify-content:space-between;
+    border: 1px solid var(--line);
+    padding: 8px 14px;
+  }
+  .modal-stats .stat .k{
+    font-family:'IBM Plex Mono', monospace;
+    font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--ash-dim); display:block; margin-bottom: 2px;
+  }
+  .modal-stats .stat .v{ font-size: 13px; color: var(--ash); }
+
+  .modal-features{
+    margin-top: 28px;
+    border-top: 1px solid var(--line);
+    padding-top: 18px;
+  }
+  .modal-features .ft-label{
+    font-family:'IBM Plex Mono', monospace;
+    font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--ash-dim);
+    text-align: center;
+    margin-bottom: 14px;
+  }
+  .modal-features ul{ list-style: none; }
+  .modal-features li{
+    font-size: 13px; color: var(--ash-dim);
+    padding: 7px 0 7px 16px;
+    position: relative;
+  }
+  .modal-features li::before{
+    content: ""; position:absolute; left:0; top: 15px;
+    width: 5px; height: 5px; border-radius: 50%;
+  }
+  .modal-panel.rift .modal-features li::before{ background: var(--rift); }
+  .modal-panel.corrosion .modal-features li::before{ background: var(--corrosion); }
+  .modal-panel.warp .modal-features li::before{ background: var(--warp); }
+
+  .modal-footer-brand{
+    margin-top: 16px;
+    font-family:'IBM Plex Mono', monospace;
+    font-size: 10px; letter-spacing: 0.1em;
+    color: var(--ash-dim);
+    opacity: 0.6;
+  }
+
+  /* ---- visual column ---- */
+  .modal-image{
+    position: relative;
+    aspect-ratio: 4/3;
+    max-width: 460px;
+    margin: 0 auto;
+    border: 1px solid var(--line);
+    overflow: hidden;
+    background: var(--bg);
+  }
+  .modal-image img{
+    position: absolute; inset: 0;
+    width: 100%; height: 100%;
+    object-fit: cover;
+    z-index: 1;
+  }
+  .modal-image .crack-bg{
+    position:absolute; inset:-10%; width:120%; height:120%;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg'><filter id='c'><feTurbulence type='turbulence' baseFrequency='0.010 0.045' numOctaves='4' seed='11' result='n'/><feDisplacementMap in='SourceGraphic' in2='n' scale='60'/></filter><rect width='100%25' height='100%25' fill='white' filter='url(%23c)'/></svg>");
+    background-size: 340px 340px;
+    opacity: 0.65;
+    mix-blend-mode: overlay;
+  }
+  .modal-image .crack-tint{ position:absolute; inset:0; mix-blend-mode: color; opacity: 0.85; }
+  .modal-panel.rift .modal-image .crack-tint{ background: var(--rift); }
+  .modal-panel.corrosion .modal-image .crack-tint{ background: var(--corrosion); }
+  .modal-panel.warp .modal-image .crack-tint{ background: var(--warp); }
+  .modal-image .crack-vignette{
+    position:absolute; inset:0;
+    background: radial-gradient(circle at 50% 40%, transparent 20%, var(--bg) 92%);
+  }
+  .modal-image .placeholder-label{
+    display: none;
+    position:absolute; bottom: 12px; right: 14px;
+    font-family:'IBM Plex Mono', monospace;
+    font-size: 10px; letter-spacing: 0.02em;
+    color: rgba(231,228,220,0.6);
+    z-index: 2;
+  }
+  .modal-image.img-missing .placeholder-label{ display: block; }
+
+  .modal-quote{
+    font-family: 'Newsreader', serif;
+    font-style: italic;
+    text-align: center;
+    color: var(--ash-dim);
+    font-size: 13px;
+    line-height: 1.6;
+    margin: 14px 0 14px;
+  }
+
+  .threat-panel{
+    border: 1px solid var(--line);
+    padding: 14px 20px;
+    display:flex; align-items:center; gap: 24px;
+    flex-wrap: wrap;
+  }
+  .threat-label{
+    font-family:'IBM Plex Mono', monospace;
+    font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--ash-dim);
+    margin-bottom: 6px;
+  }
+  .threat-word{
+    font-family: 'Black Han Sans', sans-serif;
+    font-size: 24px;
+    letter-spacing: 0.02em;
+  }
+  .modal-panel.rift .threat-word{ color: var(--rift); }
+  .modal-panel.corrosion .threat-word{ color: var(--corrosion); }
+  .modal-panel.warp .threat-word{ color: var(--warp); }
+
+  .threat-badge{
+    width: 58px; height: 58px; border-radius: 50%;
+    border: 2px solid var(--line);
+    display:flex; align-items:center; justify-content:center;
+    flex-shrink: 0;
+    font-family:'IBM Plex Mono', monospace;
+    font-size: 16px;
+    color: var(--ash-dim);
+  }
+  .modal-panel.rift .threat-badge{ border-color: var(--rift); color: var(--rift); }
+  .modal-panel.corrosion .threat-badge{ border-color: var(--corrosion); color: var(--corrosion); }
+  .modal-panel.warp .threat-badge{ border-color: var(--warp); color: var(--warp); }
+
+  .threat-bars{ display:flex; flex-direction:column; gap: 10px; flex: 1; min-width: 180px; }
+  .threat-bars .row{ display:flex; align-items:center; gap: 12px; }
+  .threat-bars .row .lb{
+    font-family:'IBM Plex Mono', monospace;
+    font-size: 11px; color: var(--ash-dim);
+    width: 76px; flex-shrink: 0;
+  }
+  .threat-bars .track{
+    flex:1; height: 5px; background: var(--surface-2); position:relative; overflow:hidden;
+  }
+  .threat-bars .track i{ position:absolute; left:0; top:0; bottom:0; display:block; }
+  .modal-panel.rift .threat-bars .track i{ background: var(--rift); }
+  .modal-panel.corrosion .threat-bars .track i{ background: var(--corrosion); }
+  .modal-panel.warp .threat-bars .track i{ background: var(--warp); }
+
+  .modal-floating-close{
+    position: absolute;
+    left: 50%; bottom: 18px;
+    transform: translateX(-50%);
+    display:flex; align-items:center; gap: 10px;
+    background: var(--bg);
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    padding: 8px 8px 8px 20px;
+    cursor: pointer;
+    font-family:'IBM Plex Mono', monospace;
+    font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--ash);
+    z-index: 4;
+    transition: border-color 0.2s ease;
+  }
+  .modal-floating-close:hover{ border-color: var(--siren); }
+  .modal-floating-close .esc{
+    font-size: 10px; color: var(--ash-dim);
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    padding: 5px 10px;
+  }
+
+  .modal-example-note{
+    text-align:center;
+    font-family:'IBM Plex Mono', monospace;
+    font-size: 10px; color: var(--ash-dim);
+    opacity: 0.55;
+    margin-top: 30px;
+  }
+
+  /* tear-apart close transition */
+  .modal-panel .modal-body{ transition: opacity 0.15s ease; }
+  .modal-panel.closing .modal-body,
+  .modal-panel.closing .modal-close,
+  .modal-panel.closing .modal-accent,
+  .modal-panel.closing .modal-floating-close{
+    opacity: 0;
+  }
+  .tear-piece{
+    position: absolute; left:0; right:0;
+    background: var(--surface-2);
+    border: 1px solid var(--line);
+    opacity: 0;
+    pointer-events: none;
+  }
+  .tear-piece.top{
+    top:0; height: 54%;
+    border-bottom: none;
+    clip-path: polygon(0 0,100% 0,100% 84%,86% 92%,74% 82%,61% 94%,48% 80%,35% 93%,22% 83%,9% 91%,0 82%);
+    filter: drop-shadow(0 6px 10px rgba(0,0,0,0.6));
+  }
+  .tear-piece.bottom{
+    bottom:0; height: 54%;
+    border-top: none;
+    clip-path: polygon(0 16%,9% 8%,22% 17%,35% 6%,48% 19%,61% 5%,74% 18%,86% 7%,100% 15%,100% 100%,0 100%);
+    filter: drop-shadow(0 -6px 10px rgba(0,0,0,0.6));
+  }
+  .modal-panel.rift .tear-piece{ box-shadow: inset 0 0 0 1px rgba(123,110,246,0.5); }
+  .modal-panel.corrosion .tear-piece{ box-shadow: inset 0 0 0 1px rgba(110,156,119,0.5); }
+  .modal-panel.warp .tear-piece{ box-shadow: inset 0 0 0 1px rgba(224,164,88,0.5); }
+  .modal-panel.closing .tear-piece{ opacity: 1; }
+  .modal-panel.closing .tear-piece.top{
+    animation: tear-up 0.5s ease-in forwards;
+  }
+  .modal-panel.closing .tear-piece.bottom{
+    animation: tear-down 0.5s ease-in forwards;
+  }
+  @keyframes tear-up{
+    0%{ transform: translate(0,0) rotate(0deg); opacity: 1; }
+    100%{ transform: translate(-8%, -90px) rotate(-10deg); opacity: 0; }
+  }
+  @keyframes tear-down{
+    0%{ transform: translate(0,0) rotate(0deg); opacity: 1; }
+    100%{ transform: translate(8%, 110px) rotate(9deg); opacity: 0; }
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    .modal-panel.closing .tear-piece{ animation: none !important; opacity: 0 !important; }
+  }
 </style>
 </head>
 <body>
@@ -765,30 +1128,39 @@
       <span class="code">01 · PHENOMENON</span>
       <h2>붕괴의 세 형태</h2>
     </div>
-    <p class="note">균열형·잠식형·왜곡형은 서로 독립적으로 발생한다. 상세 세부 룰은 추후 업데이트 예정.</p>
+    <p class="note">서로 독립적으로 도시 곳곳에 나타나며,<br>도시를 붕괴시키기 위해 나타난다.</p>
   </div>
 
   <div class="collapse-grid">
-    <div class="collapse-card rift">
+    <div class="collapse-card rift" data-modal="modal-rift" role="button" tabindex="0">
+      <div class="crack-bg"></div>
+      <div class="crack-tint"></div>
+      <div class="crack-fade"></div>
       <span class="tag"><i class="dot rift"></i>RIFT</span>
       <h3>균열형</h3>
       <div class="bar"><i></i></div>
-      <p>특정 지점에 물리적 틈이 생기고, 그 너머에서 오염체가 새어나온다. 방치하면 균열이 커진다.</p>
-      <div class="placeholder-note">세부 항목 · 추후 추가</div>
+      <p>특정 지점에 물리적 틈이 생기고, 그 너머에서 오염체가 기어나온다. 방치할수록 균열은 점점 커져간다.</p>
+      <span class="tap-hint">탭하여 관측 지점 보기 →</span>
     </div>
-    <div class="collapse-card corrosion">
+    <div class="collapse-card corrosion" data-modal="modal-corrosion" role="button" tabindex="0">
+      <div class="crack-bg"></div>
+      <div class="crack-tint"></div>
+      <div class="crack-fade"></div>
       <span class="tag"><i class="dot corrosion"></i>CORROSION</span>
       <h3>잠식형</h3>
       <div class="bar"><i></i></div>
-      <p>경계 없이 서서히 공간이 오염되며 확산된다. 오래 노출되면 사람도 서서히 변이한다.</p>
-      <div class="placeholder-note">세부 항목 · 추후 추가</div>
+      <p>경계 없이 서서히 공간이 오염되며 확산한다. 생명체가 지속 노출된다면, 오염체로 변이한다.</p>
+      <span class="tap-hint">탭하여 관측 지점 보기 →</span>
     </div>
-    <div class="collapse-card warp">
+    <div class="collapse-card warp" data-modal="modal-warp" role="button" tabindex="0">
+      <div class="crack-bg"></div>
+      <div class="crack-tint"></div>
+      <div class="crack-fade"></div>
       <span class="tag"><i class="dot warp"></i>WARP</span>
       <h3>왜곡형</h3>
       <div class="bar"><i></i></div>
-      <p>방향·거리·시간 같은 공간의 법칙 자체가 어긋난다. 갇히거나, 엉뚱한 곳으로 나오게 된다.</p>
-      <div class="placeholder-note">세부 항목 · 추후 추가</div>
+      <p>방향·거리·시간 같은 공간의 법칙 자체가 어긋난다. 갇히거나, 시간이 멈추거나, 존재가 옅어진다.</p>
+      <span class="tap-hint">탭하여 관측 지점 보기 →</span>
     </div>
   </div>
 </section>
@@ -799,7 +1171,7 @@
       <span class="code">02 · POWERS</span>
       <h2>이능력자 조직</h2>
     </div>
-    <p class="note">4개 조직 + 개인 세력 2~3명. 개인 세력은 추후 추가.</p>
+    <p class="note">붕괴를 막거나, 키우는 자들.<br>각자들의 신념은 서로를 위협한다.</p>
   </div>
 
   <div class="faction-list">
@@ -807,25 +1179,21 @@
       <span class="num mono">01</span>
       <h3>OMB</h3>
       <span class="desc">정부 소속 공식 기관. 관료적이고 규율 중심적이며, 예산과 권한은 크지만 절차가 느리다.</span>
-      <span class="status mono">— 상세 준비 중</span>
     </div>
     <div class="faction-row">
       <span class="num mono">02</span>
       <h3>루멘타 <span class="mono" style="font-size:12px;color:var(--ash-dim)">LUMENTA</span></h3>
       <span class="desc">대가 없이 돕는 자경단. 시민들에게는 신뢰받지만, 정부와는 대립각을 세운다.</span>
-      <span class="status mono">— 상세 준비 중</span>
     </div>
     <div class="faction-row">
       <span class="num mono">03</span>
       <h3>테네브라 <span class="mono" style="font-size:12px;color:var(--ash-dim)">TENEBRA</span></h3>
       <span class="desc">종교·신앙 계열 단체. 붕괴를 신벌 혹은 정화로 해석하며, 독자적인 동기로 움직인다.</span>
-      <span class="status mono">— 상세 준비 중</span>
     </div>
     <div class="faction-row">
       <span class="num mono">04</span>
       <h3>카르시아 <span class="mono" style="font-size:12px;color:var(--ash-dim)">KARSIA</span></h3>
       <span class="desc">언더그라운드 조직. 오염체·이능력 관련 암시장과 불법 실험에 관여한다.</span>
-      <span class="status mono">— 상세 준비 중</span>
     </div>
   </div>
 </section>
@@ -836,7 +1204,7 @@
       <span class="code">03 · AWAKENING</span>
       <h2>이능력 체계</h2>
     </div>
-    <p class="note">선천적 소질 + 후천적 트리거(오염 노출). 판별 불가, 각성자 비율 인구 1%.</p>
+    <p class="note">이능력자들은 아래 체계로 분류된다.</p>
   </div>
 
   <div class="ability-formula">
@@ -858,9 +1226,9 @@
     <div class="axis">
       <span class="label">무기 · Form</span>
       <ul>
-        <li>근접무기형</li>
-        <li>원거리무기형</li>
-        <li>무형매개형</li>
+        <li>완력형</li>
+        <li>사격형</li>
+        <li>마나형</li>
       </ul>
     </div>
     <div class="axis">
@@ -878,15 +1246,15 @@
   <div class="section-head">
     <div>
       <span class="code">04 · CITY</span>
-      <h2>OBLIVIA, 1~5섹터</h2>
+      <h2>도시 구역</h2>
     </div>
-    <p class="note">붕괴는 구역과 무관하게 어디서든 발생할 수 있다.</p>
+    <p class="note">도시를 이루는 섹터들.</p>
   </div>
 
   <div class="zone-map">
     <div class="zone">
       <span class="zn">01</span>
-      <div><h4>도심 / 번화가</h4><p>행정·상업 중심지. OMB 본부 소재.</p></div>
+      <div><h4>도심 / 번화가</h4><p>신시가지.</p></div>
     </div>
     <div class="zone">
       <span class="zn">02</span>
@@ -894,15 +1262,15 @@
     </div>
     <div class="zone">
       <span class="zn">03</span>
-      <div><h4>구시가지</h4><p>낙후지역. 루멘타 거점.</p></div>
+      <div><h4>구시가지</h4><p>낙후지역.</p></div>
     </div>
     <div class="zone">
       <span class="zn">04</span>
-      <div><h4>산업 / 항만</h4><p>회색지대. 카르시아 거점.</p></div>
+      <div><h4>산업 / 항만</h4><p>회색지대.</p></div>
     </div>
     <div class="zone">
       <span class="zn">05</span>
-      <div><h4>외곽 / 변두리</h4><p>테네브라 거점.</p></div>
+      <div><h4>외곽 / 변두리</h4><p>어느 이들이 사는 곳.</p></div>
     </div>
   </div>
 </section>
@@ -913,12 +1281,12 @@
       <span class="code">05 · CAST</span>
       <h2>인물</h2>
     </div>
-    <p class="note">21명 예정. 세부 프로필은 추후 채워집니다.</p>
+    <p class="note">이야기를 써내려가는 자들.</p>
   </div>
 
   <div class="cast-shell">
     <div class="count">21</div>
-    <p>CHARACTERS · IN PROGRESS</p>
+    <p>CHARACTERS</p>
     <div class="cast-grid">
       <div class="slot">?</div><div class="slot">?</div><div class="slot">?</div><div class="slot">?</div>
       <div class="slot">?</div><div class="slot">?</div><div class="slot">?</div><div class="slot">?</div>
@@ -932,6 +1300,215 @@
   <div class="brand">OBLIVIA</div>
   <div class="meta">망각의 균열 속에서 · WORLD DRAFT · SKELETON BUILD</div>
 </footer>
+
+<div class="modal-overlay" id="modal-rift">
+  <div class="modal-panel rift">
+    <div class="modal-accent"></div>
+    <div class="tear-piece top"></div>
+    <div class="tear-piece bottom"></div>
+    <div class="modal-body">
+      <div class="modal-grid">
+        <div class="modal-info">
+          <div class="modal-eyebrow"><span class="bar"></span>COLLAPSE TYPE</div>
+          <div class="modal-title-block">
+            <h3>균열형</h3>
+            <div class="en">Reality Rift</div>
+          </div>
+          <div class="modal-desc">
+            <p>특정 지점의 공간에 물리적인 틈이 생기며 시작되는 붕괴.</p>
+            <p>틈 너머에서 오염체가 기어나오며, 방치하면 균열은 점점 넓어진다.</p>
+          </div>
+          <div class="modal-stats">
+            <div class="stat"><div><span class="k">Category</span><span class="v">공간·물리 계열</span></div></div>
+            <div class="stat"><div><span class="k">First Reported</span><span class="v">AC+14</span></div></div>
+            <div class="stat"><div><span class="k">Status</span><span class="v">불안정 / 관측 중</span></div></div>
+          </div>
+          <div class="modal-footer-brand">OBLIVIA ARCHIVE</div>
+        </div>
+        <div class="modal-visual">
+          <div class="modal-image">
+            <img src="image/phenomenon/균열형.jpg" alt="균열형" onerror="this.style.display='none'; this.parentElement.classList.add('img-missing');">
+            <div class="crack-bg"></div>
+            <div class="crack-tint"></div>
+            <div class="crack-vignette"></div>
+            <span class="placeholder-label">image/phenomenon/균열형.jpg</span>
+          </div>
+          <div class="modal-quote">"틈은 닫히지 않는다.<br>그저, 우리가 그 앞을 지킬 뿐이다."</div>
+          <div class="threat-panel">
+            <div>
+              <div class="threat-label">Threat Level</div>
+              <div class="threat-word">HIGH</div>
+            </div>
+            <div class="threat-badge">◆</div>
+            <div class="threat-bars">
+              <div class="row"><span class="lb">확산 속도</span><div class="track"><i style="width:52%"></i></div></div>
+              <div class="row"><span class="lb">영향 범위</span><div class="track"><i style="width:38%"></i></div></div>
+              <div class="row"><span class="lb">예측 난이도</span><div class="track"><i style="width:70%"></i></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-floating-close">CLOSE<span class="esc">ESC</span></div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal-corrosion">
+  <div class="modal-panel corrosion">
+    <div class="modal-accent"></div>
+    <div class="tear-piece top"></div>
+    <div class="tear-piece bottom"></div>
+    <div class="modal-body">
+      <div class="modal-grid">
+        <div class="modal-info">
+          <div class="modal-eyebrow"><span class="bar"></span>COLLAPSE TYPE</div>
+          <div class="modal-title-block">
+            <h3>잠식형</h3>
+            <div class="en">Slow Corrosion</div>
+          </div>
+          <div class="modal-desc">
+            <p>경계 없이 서서히 공간이 오염되며 확산되는 붕괴.</p>
+            <p>생명체가 오래 노출되면 서서히 오염체로 변이한다.</p>
+          </div>
+          <div class="modal-stats">
+            <div class="stat"><div><span class="k">Category</span><span class="v">생물·물질 계열</span></div></div>
+            <div class="stat"><div><span class="k">First Reported</span><span class="v">AC+9</span></div></div>
+            <div class="stat"><div><span class="k">Status</span><span class="v">확산 중 / 경계 필요</span></div></div>
+          </div>
+          <div class="modal-footer-brand">OBLIVIA ARCHIVE</div>
+        </div>
+        <div class="modal-visual">
+          <div class="modal-image">
+            <img src="image/phenomenon/잠식형.jpg" alt="잠식형" onerror="this.style.display='none'; this.parentElement.classList.add('img-missing');">
+            <div class="crack-bg"></div>
+            <div class="crack-tint"></div>
+            <div class="crack-vignette"></div>
+            <span class="placeholder-label">image/phenomenon/잠식형.jpg</span>
+          </div>
+          <div class="modal-quote">"눈치챘을 땐, 이미 절반이 잠식된 뒤였다."</div>
+          <div class="threat-panel">
+            <div>
+              <div class="threat-label">Threat Level</div>
+              <div class="threat-word">SEVERE</div>
+            </div>
+            <div class="threat-badge">◆</div>
+            <div class="threat-bars">
+              <div class="row"><span class="lb">확산 속도</span><div class="track"><i style="width:33%"></i></div></div>
+              <div class="row"><span class="lb">영향 범위</span><div class="track"><i style="width:64%"></i></div></div>
+              <div class="row"><span class="lb">예측 난이도</span><div class="track"><i style="width:45%"></i></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-floating-close">CLOSE<span class="esc">ESC</span></div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal-warp">
+  <div class="modal-panel warp">
+    <div class="modal-accent"></div>
+    <div class="tear-piece top"></div>
+    <div class="tear-piece bottom"></div>
+    <div class="modal-body">
+      <div class="modal-grid">
+        <div class="modal-info">
+          <div class="modal-eyebrow"><span class="bar"></span>COLLAPSE TYPE</div>
+          <div class="modal-title-block">
+            <h3>왜곡형</h3>
+            <div class="en">Spatial Warp</div>
+          </div>
+          <div class="modal-desc">
+            <p>방향·거리·시간 같은 공간의 법칙 자체가 어긋나는 붕괴.</p>
+            <p>갇히거나, 시간이 멈추거나, 존재가 옅어지는 현상이 보고된다.</p>
+          </div>
+          <div class="modal-stats">
+            <div class="stat"><div><span class="k">Category</span><span class="v">시공간 계열</span></div></div>
+            <div class="stat"><div><span class="k">First Reported</span><span class="v">AC+21</span></div></div>
+            <div class="stat"><div><span class="k">Status</span><span class="v">예측 불가 / 산발적 발생</span></div></div>
+          </div>
+          <div class="modal-footer-brand">OBLIVIA ARCHIVE</div>
+        </div>
+        <div class="modal-visual">
+          <div class="modal-image">
+            <img src="image/phenomenon/왜곡형.jpg" alt="왜곡형" onerror="this.style.display='none'; this.parentElement.classList.add('img-missing');">
+            <div class="crack-bg"></div>
+            <div class="crack-tint"></div>
+            <div class="crack-vignette"></div>
+            <span class="placeholder-label">image/phenomenon/왜곡형.jpg</span>
+          </div>
+          <div class="modal-quote">"같은 길을 걸었는데, 다른 곳에 도착했다."</div>
+          <div class="threat-panel">
+            <div>
+              <div class="threat-label">Threat Level</div>
+              <div class="threat-word">UNSTABLE</div>
+            </div>
+            <div class="threat-badge">◆</div>
+            <div class="threat-bars">
+              <div class="row"><span class="lb">확산 속도</span><div class="track"><i style="width:20%"></i></div></div>
+              <div class="row"><span class="lb">영향 범위</span><div class="track"><i style="width:30%"></i></div></div>
+              <div class="row"><span class="lb">예측 난이도</span><div class="track"><i style="width:92%"></i></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-floating-close">CLOSE<span class="esc">ESC</span></div>
+  </div>
+</div>
+
+<script>
+  (function(){
+    function openModal(id){
+      var modal = document.getElementById(id);
+      if(!modal) return;
+      modal.classList.add('open');
+      document.body.style.overflow = 'hidden';
+    }
+    function closeModal(modal){
+      var panel = modal.querySelector('.modal-panel');
+      panel.classList.add('closing');
+      setTimeout(function(){
+        modal.style.transition = 'none';
+        modal.classList.remove('open');
+        panel.classList.remove('closing');
+        document.body.style.overflow = '';
+        void modal.offsetWidth;
+        modal.style.transition = '';
+      }, 520);
+    }
+
+    document.querySelectorAll('.collapse-card').forEach(function(card){
+      function trigger(){ openModal(card.dataset.modal); }
+      card.addEventListener('click', trigger);
+      card.addEventListener('keydown', function(e){
+        if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); trigger(); }
+      });
+    });
+
+    document.querySelectorAll('.modal-overlay').forEach(function(overlay){
+      overlay.addEventListener('click', function(e){
+        if(e.target === overlay){ closeModal(overlay); }
+      });
+      var closeBtn = overlay.querySelector('.modal-close');
+      if(closeBtn){
+        closeBtn.addEventListener('click', function(){ closeModal(overlay); });
+      }
+      var floatingClose = overlay.querySelector('.modal-floating-close');
+      if(floatingClose){
+        floatingClose.addEventListener('click', function(){ closeModal(overlay); });
+      }
+    });
+
+    document.addEventListener('keydown', function(e){
+      if(e.key === 'Escape'){
+        document.querySelectorAll('.modal-overlay.open').forEach(function(overlay){
+          closeModal(overlay);
+        });
+      }
+    });
+  })();
+</script>
 
 </body>
 </html>
