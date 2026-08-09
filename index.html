@@ -426,6 +426,14 @@
   .zone{
     background: var(--surface); padding: 28px 20px; min-height: 180px;
     display:flex; flex-direction:column; justify-content:space-between;
+    cursor: pointer;
+    transition: transform 0.25s ease, box-shadow 0.25s ease, background 0.25s ease;
+  }
+  .zone:hover, .zone:focus-visible{
+    transform: translateY(-4px);
+    background: var(--surface-2);
+    box-shadow: 0 14px 32px rgba(0,0,0,0.45);
+    outline: none;
   }
   .zone .zn{ font-family:'IBM Plex Mono', monospace; font-size: 34px; color: var(--ash-dim); }
   .zone h4{ font-family:'Song Myung', serif; font-size: 22px; color: var(--ash); letter-spacing:0.02em; }
@@ -722,7 +730,8 @@
   /* ---------- location modal ---------- */
   .modal-overlay{
     position: fixed; inset: 0; z-index: 800;
-    display:flex; align-items:center; justify-content:center;
+    display:flex; flex-direction: column; align-items:center; justify-content:center;
+    gap: 18px;
     padding: 24px;
     background: rgba(5,6,10,0);
     opacity: 0; pointer-events: none;
@@ -741,7 +750,7 @@
     background: var(--surface);
     border: 1px solid var(--line);
     border-radius: 18px;
-    padding: 28px 40px 64px;
+    padding: 28px 40px;
     transform: scale(0.94) translateY(14px);
     opacity: 0;
     transition: transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.3s ease;
@@ -758,6 +767,7 @@
   .modal-panel .modal-accent{
     position:absolute; top:0; left:0; right:0; height: 4px;
     border-radius: 18px 18px 0 0;
+    background: var(--siren);
   }
   .modal-panel.rift .modal-accent{ background: var(--rift); }
   .modal-panel.corrosion .modal-accent{ background: var(--corrosion); }
@@ -785,6 +795,52 @@
   }
   @media (max-width: 760px){
     .modal-grid{ grid-template-columns: 1fr; }
+  }
+
+  /* ---- zone modal: location switcher ---- */
+  .location-list{
+    margin-top: 22px;
+    display:flex; flex-direction: column; gap: 6px;
+  }
+  .loc-btn{
+    text-align: left;
+    background: transparent;
+    border: 1px solid var(--line);
+    color: var(--ash-dim);
+    font-family:'IBM Plex Mono', monospace;
+    font-size: 12px; letter-spacing: 0.03em;
+    padding: 11px 14px;
+    cursor: pointer;
+    transition: border-color 0.2s ease, color 0.2s ease, background 0.2s ease;
+  }
+  .loc-btn:hover{ border-color: var(--siren); color: var(--ash); }
+  .loc-btn.active{
+    border-color: var(--siren);
+    color: var(--siren);
+    background: rgba(232,163,61,0.08);
+  }
+
+  .zone-visual{ position: relative; }
+  .loc-panel{ display: none; }
+  .loc-panel.active{
+    display: block;
+    animation: loc-morph-in 0.32s ease;
+  }
+  @keyframes loc-morph-in{
+    from{ opacity: 0; transform: scale(0.97); filter: blur(5px); }
+    to{ opacity: 1; transform: scale(1); filter: blur(0); }
+  }
+  .loc-detail{ margin-top: 14px; }
+  .loc-detail h4{
+    font-family: 'Song Myung', serif;
+    font-size: 22px;
+    color: var(--ash);
+    margin-bottom: 8px;
+  }
+  .loc-detail p{
+    font-size: 13px;
+    color: var(--ash-dim);
+    line-height: 1.6;
   }
 
   .modal-eyebrow{
@@ -964,11 +1020,10 @@
   .modal-panel.warp .threat-bars .track i{ background: var(--warp); }
 
   .modal-floating-close{
-    position: absolute;
-    left: 50%; bottom: 18px;
-    transform: translateX(-50%);
+    position: relative;
+    flex-shrink: 0;
     display:flex; align-items:center; gap: 10px;
-    background: var(--bg);
+    background: var(--surface);
     border: 1px solid var(--line);
     border-radius: 999px;
     padding: 8px 8px 8px 20px;
@@ -977,8 +1032,11 @@
     font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase;
     color: var(--ash);
     z-index: 4;
-    transition: border-color 0.2s ease;
+    opacity: 0;
+    transform: translateY(6px);
+    transition: border-color 0.2s ease, opacity 0.3s ease 0.1s, transform 0.3s ease 0.1s;
   }
+  .modal-overlay.open .modal-floating-close{ opacity: 1; transform: translateY(0); }
   .modal-floating-close:hover{ border-color: var(--siren); }
   .modal-floating-close .esc{
     font-size: 10px; color: var(--ash-dim);
@@ -999,9 +1057,12 @@
   .modal-panel .modal-body{ transition: opacity 0.15s ease; }
   .modal-panel.closing .modal-body,
   .modal-panel.closing .modal-close,
-  .modal-panel.closing .modal-accent,
-  .modal-panel.closing .modal-floating-close{
+  .modal-panel.closing .modal-accent{
     opacity: 0;
+  }
+  .modal-overlay:has(.modal-panel.closing) .modal-floating-close{
+    opacity: 0;
+    transition: opacity 0.15s ease;
   }
   .tear-piece{
     position: absolute; left:0; right:0;
@@ -1128,7 +1189,7 @@
       <span class="code">01 · PHENOMENON</span>
       <h2>붕괴의 세 형태</h2>
     </div>
-    <p class="note">서로 독립적으로 도시 곳곳에 나타나며,<br>도시를 붕괴시키기 위해 나타난다.</p>
+    <p class="note">서로 독립적으로 도시 곳곳에 나타나며,<br>도시를 붕괴시키기 위한 저주이다.</p>
   </div>
 
   <div class="collapse-grid">
@@ -1252,23 +1313,23 @@
   </div>
 
   <div class="zone-map">
-    <div class="zone">
+    <div class="zone" data-modal="modal-zone1" role="button" tabindex="0">
       <span class="zn">01</span>
       <div><h4>도심 / 번화가</h4><p>신시가지.</p></div>
     </div>
-    <div class="zone">
+    <div class="zone" data-modal="modal-zone2" role="button" tabindex="0">
       <span class="zn">02</span>
       <div><h4>주거지역</h4><p>일반 시민 생활권.</p></div>
     </div>
-    <div class="zone">
+    <div class="zone" data-modal="modal-zone3" role="button" tabindex="0">
       <span class="zn">03</span>
       <div><h4>구시가지</h4><p>낙후지역.</p></div>
     </div>
-    <div class="zone">
+    <div class="zone" data-modal="modal-zone4" role="button" tabindex="0">
       <span class="zn">04</span>
       <div><h4>산업 / 항만</h4><p>회색지대.</p></div>
     </div>
-    <div class="zone">
+    <div class="zone" data-modal="modal-zone5" role="button" tabindex="0">
       <span class="zn">05</span>
       <div><h4>외곽 / 변두리</h4><p>어느 이들이 사는 곳.</p></div>
     </div>
@@ -1349,8 +1410,8 @@
         </div>
       </div>
     </div>
-    <div class="modal-floating-close">CLOSE<span class="esc">ESC</span></div>
   </div>
+  <div class="modal-floating-close">CLOSE<span class="esc">ESC</span></div>
 </div>
 
 <div class="modal-overlay" id="modal-corrosion">
@@ -1401,8 +1462,8 @@
         </div>
       </div>
     </div>
-    <div class="modal-floating-close">CLOSE<span class="esc">ESC</span></div>
   </div>
+  <div class="modal-floating-close">CLOSE<span class="esc">ESC</span></div>
 </div>
 
 <div class="modal-overlay" id="modal-warp">
@@ -1453,10 +1514,357 @@
         </div>
       </div>
     </div>
-    <div class="modal-floating-close">CLOSE<span class="esc">ESC</span></div>
   </div>
+  <div class="modal-floating-close">CLOSE<span class="esc">ESC</span></div>
 </div>
 
+<div class="modal-overlay" id="modal-zone1">
+  <div class="modal-panel" data-zone="zone1">
+    <div class="modal-accent"></div>
+    <div class="tear-piece top"></div>
+    <div class="tear-piece bottom"></div>
+    <div class="modal-body">
+      <div class="modal-grid">
+        <div class="modal-info">
+          <div class="modal-eyebrow"><span class="bar"></span>ZONE 01</div>
+          <div class="modal-title-block">
+            <h3>도심 · 번화가</h3>
+            <div class="en">Downtown District</div>
+          </div>
+          <div class="modal-desc">
+            <p>행정·상업 중심지. 붕괴 이후에도 가장 먼저 복구되는 구역이라, 다른 구역과의 격차를 상징하기도 한다.</p>
+          </div>
+          <div class="location-list">
+            <button class="loc-btn active" data-loc="omb">OMB 본부</button>
+            <button class="loc-btn" data-loc="commercial">상업지구</button>
+            <button class="loc-btn" data-loc="media">방송국 · 언론사</button>
+            <button class="loc-btn" data-loc="shield">대형 실드 · 방벽 시설</button>
+          </div>
+          <div class="modal-footer-brand">OBLIVIA ARCHIVE</div>
+        </div>
+        <div class="zone-visual">
+            <div class="loc-panel active" data-loc="omb">
+              <div class="modal-image">
+                <img src="image/zones/01구역/OMB본부.jpg" alt="OMB 본부" onerror="this.style.display='none'; this.parentElement.classList.add('img-missing');">
+                <div class="crack-bg"></div>
+                <div class="crack-vignette"></div>
+                <span class="placeholder-label">image/zones/01구역/OMB본부.jpg</span>
+              </div>
+              <div class="loc-detail">
+                <h4>OMB 본부</h4>
+                <p>관공서 특유의 위압감이 감도는 거대 청사. 붕괴 대응의 모든 명령이 이곳에서 내려진다.</p>
+              </div>
+            </div>
+            <div class="loc-panel" data-loc="commercial">
+              <div class="modal-image">
+                <img src="image/zones/01구역/상업지구.jpg" alt="상업지구" onerror="this.style.display='none'; this.parentElement.classList.add('img-missing');">
+                <div class="crack-bg"></div>
+                <div class="crack-vignette"></div>
+                <span class="placeholder-label">image/zones/01구역/상업지구.jpg</span>
+              </div>
+              <div class="loc-detail">
+                <h4>상업지구</h4>
+                <p>백화점과 오피스 타워가 늘어선 구역. 붕괴 이후에도 가장 먼저 복구되어, '돈만 있으면 안전하다'는 말이 나오는 곳이다.</p>
+              </div>
+            </div>
+            <div class="loc-panel" data-loc="media">
+              <div class="modal-image">
+                <img src="image/zones/01구역/방송국_언론사.jpg" alt="방송국 · 언론사" onerror="this.style.display='none'; this.parentElement.classList.add('img-missing');">
+                <div class="crack-bg"></div>
+                <div class="crack-vignette"></div>
+                <span class="placeholder-label">image/zones/01구역/방송국_언론사.jpg</span>
+              </div>
+              <div class="loc-detail">
+                <h4>방송국 · 언론사</h4>
+                <p>매일같이 붕괴 소식을 내보내는 곳. 시민들이 오늘의 붕괴 현황을 가장 먼저 접하는 창구다.</p>
+              </div>
+            </div>
+            <div class="loc-panel" data-loc="shield">
+              <div class="modal-image">
+                <img src="image/zones/01구역/대형실드_방벽시설.jpg" alt="대형 실드 · 방벽 시설" onerror="this.style.display='none'; this.parentElement.classList.add('img-missing');">
+                <div class="crack-bg"></div>
+                <div class="crack-vignette"></div>
+                <span class="placeholder-label">image/zones/01구역/대형실드_방벽시설.jpg</span>
+              </div>
+              <div class="loc-detail">
+                <h4>대형 실드 · 방벽 시설</h4>
+                <p>도심을 우선적으로 보호하는 대규모 방어 인프라. 다른 구역과의 격차를 상징하는 시설이기도 하다.</p>
+              </div>
+            </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="modal-floating-close">CLOSE<span class="esc">ESC</span></div>
+</div>
+
+<div class="modal-overlay" id="modal-zone2">
+  <div class="modal-panel" data-zone="zone2">
+    <div class="modal-accent"></div>
+    <div class="tear-piece top"></div>
+    <div class="tear-piece bottom"></div>
+    <div class="modal-body">
+      <div class="modal-grid">
+        <div class="modal-info">
+          <div class="modal-eyebrow"><span class="bar"></span>ZONE 02</div>
+          <div class="modal-title-block">
+            <h3>주거지역</h3>
+            <div class="en">Residential District</div>
+          </div>
+          <div class="modal-desc">
+            <p>일반 시민 생활권. 붕괴가 배경이고 일상이 전경인, 이 도시에서 가장 평범한 구역.</p>
+          </div>
+          <div class="location-list">
+            <button class="loc-btn active" data-loc="apt">아파트 단지 · 학교 · 상점가</button>
+            <button class="loc-btn" data-loc="shelter">대피소 · 방공호</button>
+            <button class="loc-btn" data-loc="center">지역 커뮤니티 센터</button>
+          </div>
+          <div class="modal-footer-brand">OBLIVIA ARCHIVE</div>
+        </div>
+        <div class="zone-visual">
+            <div class="loc-panel active" data-loc="apt">
+              <div class="modal-image">
+                <img src="image/zones/02구역/아파트단지_학교_상점가.jpg" alt="아파트 단지 · 학교 · 상점가" onerror="this.style.display='none'; this.parentElement.classList.add('img-missing');">
+                <div class="crack-bg"></div>
+                <div class="crack-vignette"></div>
+                <span class="placeholder-label">image/zones/02구역/아파트단지_학교_상점가.jpg</span>
+              </div>
+              <div class="loc-detail">
+                <h4>아파트 단지 · 학교 · 상점가</h4>
+                <p>가장 평범한 일상이 이어지는 구역. 붕괴는 여기서도 뉴스 속 이야기가 아니라 생활의 일부다.</p>
+              </div>
+            </div>
+            <div class="loc-panel" data-loc="shelter">
+              <div class="modal-image">
+                <img src="image/zones/02구역/대피소_방공호.jpg" alt="대피소 · 방공호" onerror="this.style.display='none'; this.parentElement.classList.add('img-missing');">
+                <div class="crack-bg"></div>
+                <div class="crack-vignette"></div>
+                <span class="placeholder-label">image/zones/02구역/대피소_방공호.jpg</span>
+              </div>
+              <div class="loc-detail">
+                <h4>대피소 · 방공호</h4>
+                <p>붕괴 경보가 울리면 시민들이 향하는 곳. 이제는 익숙해진 대피 훈련의 무대다.</p>
+              </div>
+            </div>
+            <div class="loc-panel" data-loc="center">
+              <div class="modal-image">
+                <img src="image/zones/02구역/지역커뮤니티센터.jpg" alt="지역 커뮤니티 센터" onerror="this.style.display='none'; this.parentElement.classList.add('img-missing');">
+                <div class="crack-bg"></div>
+                <div class="crack-vignette"></div>
+                <span class="placeholder-label">image/zones/02구역/지역커뮤니티센터.jpg</span>
+              </div>
+              <div class="loc-detail">
+                <h4>지역 커뮤니티 센터</h4>
+                <p>오염 노출 이력을 확인하거나 상담을 받을 수 있는 곳. 확실한 각성 여부는 알 수 없어도, 최소한의 안심을 주는 장소.</p>
+              </div>
+            </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="modal-floating-close">CLOSE<span class="esc">ESC</span></div>
+</div>
+
+<div class="modal-overlay" id="modal-zone3">
+  <div class="modal-panel" data-zone="zone3">
+    <div class="modal-accent"></div>
+    <div class="tear-piece top"></div>
+    <div class="tear-piece bottom"></div>
+    <div class="modal-body">
+      <div class="modal-grid">
+        <div class="modal-info">
+          <div class="modal-eyebrow"><span class="bar"></span>ZONE 03</div>
+          <div class="modal-title-block">
+            <h3>구시가지</h3>
+            <div class="en">Old Town</div>
+          </div>
+          <div class="modal-desc">
+            <p>낙후지역. 정부 지원이 닿지 않는 자리에, 루멘타가 자경단으로 자리 잡았다.</p>
+          </div>
+          <div class="location-list">
+            <button class="loc-btn active" data-loc="market">낡은 상가 · 재래시장</button>
+            <button class="loc-btn" data-loc="lumenta">루멘타 본부</button>
+            <button class="loc-btn" data-loc="houses">오래된 주택가</button>
+          </div>
+          <div class="modal-footer-brand">OBLIVIA ARCHIVE</div>
+        </div>
+        <div class="zone-visual">
+            <div class="loc-panel active" data-loc="market">
+              <div class="modal-image">
+                <img src="image/zones/03구역/낡은상가_재래시장.jpg" alt="낡은 상가 · 재래시장" onerror="this.style.display='none'; this.parentElement.classList.add('img-missing');">
+                <div class="crack-bg"></div>
+                <div class="crack-vignette"></div>
+                <span class="placeholder-label">image/zones/03구역/낡은상가_재래시장.jpg</span>
+              </div>
+              <div class="loc-detail">
+                <h4>낡은 상가 · 재래시장</h4>
+                <p>정부 지원이 부족해 자경단이 자생적으로 자리잡은 배경이 된, 오래된 상권.</p>
+              </div>
+            </div>
+            <div class="loc-panel" data-loc="lumenta">
+              <div class="modal-image">
+                <img src="image/zones/03구역/루멘타본부.jpg" alt="루멘타 본부" onerror="this.style.display='none'; this.parentElement.classList.add('img-missing');">
+                <div class="crack-bg"></div>
+                <div class="crack-vignette"></div>
+                <span class="placeholder-label">image/zones/03구역/루멘타본부.jpg</span>
+              </div>
+              <div class="loc-detail">
+                <h4>루멘타 본부</h4>
+                <p>폐건물을 개조한 아지트. 정부 청사의 위압감과는 정반대의, 허름하지만 사람 냄새 나는 공간.</p>
+              </div>
+            </div>
+            <div class="loc-panel" data-loc="houses">
+              <div class="modal-image">
+                <img src="image/zones/03구역/오래된주택가.jpg" alt="오래된 주택가" onerror="this.style.display='none'; this.parentElement.classList.add('img-missing');">
+                <div class="crack-bg"></div>
+                <div class="crack-vignette"></div>
+                <span class="placeholder-label">image/zones/03구역/오래된주택가.jpg</span>
+              </div>
+              <div class="loc-detail">
+                <h4>오래된 주택가</h4>
+                <p>노년층과 저소득층이 많이 남은 구역. 도시가 잊어가는 사람들의 자리.</p>
+              </div>
+            </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="modal-floating-close">CLOSE<span class="esc">ESC</span></div>
+</div>
+
+<div class="modal-overlay" id="modal-zone4">
+  <div class="modal-panel" data-zone="zone4">
+    <div class="modal-accent"></div>
+    <div class="tear-piece top"></div>
+    <div class="tear-piece bottom"></div>
+    <div class="modal-body">
+      <div class="modal-grid">
+        <div class="modal-info">
+          <div class="modal-eyebrow"><span class="bar"></span>ZONE 04</div>
+          <div class="modal-title-block">
+            <h3>산업 · 항만</h3>
+            <div class="en">Industrial Harbor</div>
+          </div>
+          <div class="modal-desc">
+            <p>회색지대. 인적이 드문 물류 배경 속에서, 카르시아가 은밀히 자리를 넓혀간다.</p>
+          </div>
+          <div class="location-list">
+            <button class="loc-btn active" data-loc="port">폐공장지대 · 컨테이너 부두</button>
+            <button class="loc-btn" data-loc="karsia">카르시아 아지트</button>
+            <button class="loc-btn" data-loc="waste">오염체 부산물 처리 시설</button>
+          </div>
+          <div class="modal-footer-brand">OBLIVIA ARCHIVE</div>
+        </div>
+        <div class="zone-visual">
+            <div class="loc-panel active" data-loc="port">
+              <div class="modal-image">
+                <img src="image/zones/04구역/폐공장지대_컨테이너부두.jpg" alt="폐공장지대 · 컨테이너 부두" onerror="this.style.display='none'; this.parentElement.classList.add('img-missing');">
+                <div class="crack-bg"></div>
+                <div class="crack-vignette"></div>
+                <span class="placeholder-label">image/zones/04구역/폐공장지대_컨테이너부두.jpg</span>
+              </div>
+              <div class="loc-detail">
+                <h4>폐공장지대 · 컨테이너 부두</h4>
+                <p>인적이 드문 물류 창고와 부두. 낮과 밤의 분위기가 완전히 다른, 암시장의 배경이 되는 곳.</p>
+              </div>
+            </div>
+            <div class="loc-panel" data-loc="karsia">
+              <div class="modal-image">
+                <img src="image/zones/04구역/카르시아아지트.jpg" alt="카르시아 아지트" onerror="this.style.display='none'; this.parentElement.classList.add('img-missing');">
+                <div class="crack-bg"></div>
+                <div class="crack-vignette"></div>
+                <span class="placeholder-label">image/zones/04구역/카르시아아지트.jpg</span>
+              </div>
+              <div class="loc-detail">
+                <h4>카르시아 아지트</h4>
+                <p>지하 창고를 개조한 거점. 정확히 무엇이 오가는지는 아무도 자세히 묻지 않는다.</p>
+              </div>
+            </div>
+            <div class="loc-panel" data-loc="waste">
+              <div class="modal-image">
+                <img src="image/zones/04구역/오염체부산물처리시설.jpg" alt="오염체 부산물 처리 시설" onerror="this.style.display='none'; this.parentElement.classList.add('img-missing');">
+                <div class="crack-bg"></div>
+                <div class="crack-vignette"></div>
+                <span class="placeholder-label">image/zones/04구역/오염체부산물처리시설.jpg</span>
+              </div>
+              <div class="loc-detail">
+                <h4>오염체 부산물 처리 시설</h4>
+                <p>공식적으로는 존재하지 않는 시설. 카르시아가 다루는 물건들의 출처를 짐작하게 하는 곳.</p>
+              </div>
+            </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="modal-floating-close">CLOSE<span class="esc">ESC</span></div>
+</div>
+
+<div class="modal-overlay" id="modal-zone5">
+  <div class="modal-panel" data-zone="zone5">
+    <div class="modal-accent"></div>
+    <div class="tear-piece top"></div>
+    <div class="tear-piece bottom"></div>
+    <div class="modal-body">
+      <div class="modal-grid">
+        <div class="modal-info">
+          <div class="modal-eyebrow"><span class="bar"></span>ZONE 05</div>
+          <div class="modal-title-block">
+            <h3>외곽 · 변두리</h3>
+            <div class="en">Outer Rim</div>
+          </div>
+          <div class="modal-desc">
+            <p>도심에서 가장 멀리 떨어진 구역. 세속과 단절된 자리에 테네브라가 뿌리내렸다.</p>
+          </div>
+          <div class="location-list">
+            <button class="loc-btn active" data-loc="temple">테네브라 본당 · 신전</button>
+            <button class="loc-btn" data-loc="ruins">방치된 붕괴 흔적</button>
+            <button class="loc-btn" data-loc="village">신도들의 마을</button>
+          </div>
+          <div class="modal-footer-brand">OBLIVIA ARCHIVE</div>
+        </div>
+        <div class="zone-visual">
+            <div class="loc-panel active" data-loc="temple">
+              <div class="modal-image">
+                <img src="image/zones/05구역/테네브라본당_신전.jpg" alt="테네브라 본당 · 신전" onerror="this.style.display='none'; this.parentElement.classList.add('img-missing');">
+                <div class="crack-bg"></div>
+                <div class="crack-vignette"></div>
+                <span class="placeholder-label">image/zones/05구역/테네브라본당_신전.jpg</span>
+              </div>
+              <div class="loc-detail">
+                <h4>테네브라 본당 · 신전</h4>
+                <p>도심에서 가장 멀리 떨어진 종교 시설. 세속과 단절된 만큼 독자적인 규율이 살아있는 곳.</p>
+              </div>
+            </div>
+            <div class="loc-panel" data-loc="ruins">
+              <div class="modal-image">
+                <img src="image/zones/05구역/방치된붕괴흔적.jpg" alt="방치된 붕괴 흔적" onerror="this.style.display='none'; this.parentElement.classList.add('img-missing');">
+                <div class="crack-bg"></div>
+                <div class="crack-vignette"></div>
+                <span class="placeholder-label">image/zones/05구역/방치된붕괴흔적.jpg</span>
+              </div>
+              <div class="loc-detail">
+                <h4>방치된 붕괴 흔적</h4>
+                <p>복구 우선순위에서 밀려나 그대로 남은 오래된 균열·잠식 자국. 도시가 외면한 상처.</p>
+              </div>
+            </div>
+            <div class="loc-panel" data-loc="village">
+              <div class="modal-image">
+                <img src="image/zones/05구역/신도들의마을.jpg" alt="신도들의 마을" onerror="this.style.display='none'; this.parentElement.classList.add('img-missing');">
+                <div class="crack-bg"></div>
+                <div class="crack-vignette"></div>
+                <span class="placeholder-label">image/zones/05구역/신도들의마을.jpg</span>
+              </div>
+              <div class="loc-detail">
+                <h4>신도들의 마을</h4>
+                <p>테네브라를 따라 이주해 온 사람들이 이룬 자치 구역. 바깥세상과는 다른 질서로 돌아간다.</p>
+              </div>
+            </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="modal-floating-close">CLOSE<span class="esc">ESC</span></div>
+</div>
 <script>
   (function(){
     function openModal(id){
@@ -1483,6 +1891,30 @@
       card.addEventListener('click', trigger);
       card.addEventListener('keydown', function(e){
         if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); trigger(); }
+      });
+    });
+
+    document.querySelectorAll('.zone[data-modal]').forEach(function(card){
+      function trigger(){ openModal(card.dataset.modal); }
+      card.addEventListener('click', trigger);
+      card.addEventListener('keydown', function(e){
+        if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); trigger(); }
+      });
+    });
+
+    document.querySelectorAll('.modal-panel[data-zone]').forEach(function(panel){
+      var btns = panel.querySelectorAll('.loc-btn');
+      var panels = panel.querySelectorAll('.loc-panel');
+      btns.forEach(function(btn){
+        btn.addEventListener('click', function(){
+          if(btn.classList.contains('active')) return;
+          btns.forEach(function(b){ b.classList.remove('active'); });
+          btn.classList.add('active');
+          var key = btn.dataset.loc;
+          panels.forEach(function(lp){
+            lp.classList.toggle('active', lp.dataset.loc === key);
+          });
+        });
       });
     });
 
