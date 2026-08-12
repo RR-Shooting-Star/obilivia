@@ -18,6 +18,11 @@
     --corrosion: #6E9C77;
     --warp: #E0A458;
     --siren: #E8A33D;
+    --omb: #6E8CA6;
+    --lumenta: #E8A33D;
+    --tenebra: #7B6EF6;
+    --karsia: #B5453F;
+    --unaffiliated: #9CA1AC;
   }
 
   *{ box-sizing: border-box; margin:0; padding:0; }
@@ -439,28 +444,89 @@
   .zone h4{ font-family:'Song Myung', serif; font-size: 22px; color: var(--ash); letter-spacing:0.02em; }
   .zone p{ font-size: 13px; color: var(--ash-dim); }
 
-  /* ---------- characters (placeholder) ---------- */
-  .cast-shell{
-    border: 1px dashed var(--line);
-    padding: 60px 32px;
-    text-align: center;
+  /* ---------- characters ---------- */
+  .cast-filter{
+    display:flex; flex-wrap: wrap; gap: 8px;
+    margin-bottom: 32px;
   }
-  .cast-shell .count{
-    font-family:'Song Myung', serif;
-    font-size: 96px;
-    color: var(--ash-dim);
-  }
-  .cast-shell p{ color: var(--ash-dim); font-family:'IBM Plex Mono', monospace; font-size: 13px; margin-top: 8px; }
-  .cast-grid{
-    display:grid; grid-template-columns: repeat(7, 1fr); gap: 8px; margin-top: 36px;
-  }
-  @media (max-width: 760px){ .cast-grid{ grid-template-columns: repeat(4, 1fr); } }
-  .cast-grid .slot{
-    aspect-ratio: 3/4;
-    border: 1px solid var(--line);
-    display:flex; align-items:center; justify-content:center;
+  .cast-filter-btn{
     font-family:'IBM Plex Mono', monospace;
-    font-size: 11px; color: var(--line);
+    font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase;
+    background: transparent;
+    border: 1px solid var(--line);
+    color: var(--ash-dim);
+    padding: 9px 16px;
+    cursor: pointer;
+    transition: border-color 0.2s ease, color 0.2s ease, background 0.2s ease;
+  }
+  .cast-filter-btn:hover{ border-color: var(--siren); color: var(--ash); }
+  .cast-filter-btn.active{
+    border-color: var(--siren); color: var(--siren);
+    background: rgba(232,163,61,0.08);
+  }
+
+  .cast-grid{
+    display:grid; grid-template-columns: repeat(7, 1fr); gap: 10px;
+  }
+  @media (max-width: 900px){ .cast-grid{ grid-template-columns: repeat(4, 1fr); } }
+  @media (max-width: 520px){ .cast-grid{ grid-template-columns: repeat(3, 1fr); } }
+
+  .cast-card{
+    aspect-ratio: 3/4;
+    position: relative;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-top: 2px solid var(--faction-color, var(--line));
+    cursor: pointer;
+    overflow: hidden;
+    display:flex; flex-direction: column; justify-content: flex-end;
+    padding: 10px;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+  }
+  .cast-card:hover, .cast-card:focus-visible{
+    transform: translateY(-4px);
+    background: var(--surface-2);
+    box-shadow: 0 12px 26px rgba(0,0,0,0.5);
+    outline: none;
+  }
+  .cast-card.hidden{ display: none; }
+  .cast-card .cc-photo{
+    position: absolute; inset: 0;
+    width: 100%; height: 100%;
+    object-fit: cover;
+    z-index: 1;
+  }
+  .cast-card .cc-fade{
+    position: absolute; left:0; right:0; bottom:0; height: 22%;
+    background: linear-gradient(to top, rgba(0,0,0,0.85), transparent);
+    z-index: 2;
+    pointer-events: none;
+  }
+  .cast-card .cc-num{
+    position: absolute; top: 10px; left: 10px;
+    font-family:'IBM Plex Mono', monospace;
+    font-size: 10px; color: var(--ash-dim);
+    z-index: 3;
+  }
+  .cast-card .cc-mark{
+    position: absolute; top: 50%; left: 50%;
+    transform: translate(-50%, -55%);
+    font-family:'Song Myung', serif;
+    font-size: 30px; color: var(--line);
+    z-index: 0;
+  }
+  .cast-card .cc-faction{
+    position: relative; z-index: 3;
+    font-family:'IBM Plex Mono', monospace;
+    font-size: 9px; letter-spacing: 0.06em; text-transform: uppercase;
+    color: var(--faction-color, var(--ash-dim));
+  }
+  .cast-card .cc-name{
+    position: relative; z-index: 3;
+    font-family:'Song Myung', serif;
+    font-size: 13px; color: var(--ash);
+    margin-top: 2px;
+    text-shadow: 0 1px 4px rgba(0,0,0,0.8);
   }
 
   /* ---------- footer ---------- */
@@ -764,14 +830,42 @@
     transition: background 0.1s ease, border-color 0.1s ease;
   }
 
+  /* character file: flung in from far off-screen bottom-right, flung out to top-left */
+  .modal-panel.character-file{
+    transform: translate(140vw, 120vh) rotate(26deg) scale(0.7);
+    opacity: 0;
+    transition: transform 0.62s cubic-bezier(0.25, 1.05, 0.5, 1), opacity 0.4s ease;
+    cursor: grab;
+    user-select: none;
+  }
+  .modal-panel.character-file.grabbing{ cursor: grabbing; }
+  .modal-overlay.open .modal-panel.character-file{
+    transform: translate(0,0) rotate(0deg) scale(1);
+    opacity: 1;
+  }
+  .modal-panel.character-file.closing{
+    background: var(--surface) !important;
+    border-color: var(--line) !important;
+    transform: translate(-140vw, -120vh) rotate(-28deg) scale(0.7) !important;
+    opacity: 0 !important;
+    transition: transform 0.5s cubic-bezier(0.55, 0, 0.85, 0.25), opacity 0.35s ease !important;
+  }
+
   .modal-panel .modal-accent{
     position:absolute; top:0; left:0; right:0; height: 4px;
     border-radius: 18px 18px 0 0;
-    background: var(--siren);
+    background: var(--faction-color, var(--siren));
   }
   .modal-panel.rift .modal-accent{ background: var(--rift); }
   .modal-panel.corrosion .modal-accent{ background: var(--corrosion); }
   .modal-panel.warp .modal-accent{ background: var(--warp); }
+
+  /* zone -> associated faction color */
+  .modal-panel[data-zone="zone1"]{ --faction-color: var(--omb); }
+  .modal-panel[data-zone="zone2"]{ --faction-color: var(--unaffiliated); }
+  .modal-panel[data-zone="zone3"]{ --faction-color: var(--lumenta); }
+  .modal-panel[data-zone="zone4"]{ --faction-color: var(--karsia); }
+  .modal-panel[data-zone="zone5"]{ --faction-color: var(--tenebra); }
 
   .modal-close{
     position: absolute; top: 22px; right: 22px;
@@ -813,11 +907,11 @@
     cursor: pointer;
     transition: border-color 0.2s ease, color 0.2s ease, background 0.2s ease;
   }
-  .loc-btn:hover{ border-color: var(--siren); color: var(--ash); }
+  .loc-btn:hover{ border-color: var(--faction-color, var(--siren)); color: var(--ash); }
   .loc-btn.active{
-    border-color: var(--siren);
-    color: var(--siren);
-    background: rgba(232,163,61,0.08);
+    border-color: var(--faction-color, var(--siren));
+    color: var(--faction-color, var(--siren));
+    background: color-mix(in srgb, var(--faction-color, var(--siren)) 10%, transparent);
   }
 
   .zone-visual{ position: relative; }
@@ -850,7 +944,7 @@
     color: var(--ash-dim);
     margin-bottom: 12px;
   }
-  .modal-eyebrow .bar{ width: 2px; height: 14px; }
+  .modal-eyebrow .bar{ width: 2px; height: 14px; background: var(--faction-color, var(--siren)); }
   .modal-panel.rift .modal-eyebrow .bar{ background: var(--rift); }
   .modal-panel.corrosion .modal-eyebrow .bar{ background: var(--corrosion); }
   .modal-panel.warp .modal-eyebrow .bar{ background: var(--warp); }
@@ -1053,7 +1147,7 @@
     margin-top: 30px;
   }
 
-  /* tear-apart close transition */
+  /* tear-apart close transition (collapse & zone modals) */
   .modal-panel .modal-body{ transition: opacity 0.15s ease; }
   .modal-panel.closing .modal-body,
   .modal-panel.closing .modal-close,
@@ -1086,6 +1180,7 @@
   .modal-panel.rift .tear-piece{ box-shadow: inset 0 0 0 1px rgba(123,110,246,0.5); }
   .modal-panel.corrosion .tear-piece{ box-shadow: inset 0 0 0 1px rgba(110,156,119,0.5); }
   .modal-panel.warp .tear-piece{ box-shadow: inset 0 0 0 1px rgba(224,164,88,0.5); }
+  .modal-panel[data-zone] .tear-piece{ box-shadow: inset 0 0 0 1px var(--faction-color, var(--siren)); }
   .modal-panel.closing .tear-piece{ opacity: 1; }
   .modal-panel.closing .tear-piece.top{
     animation: tear-up 0.5s ease-in forwards;
@@ -1104,6 +1199,145 @@
 
   @media (prefers-reduced-motion: reduce){
     .modal-panel.closing .tear-piece{ animation: none !important; opacity: 0 !important; }
+    .modal-panel.character-file{ animation: none !important; transform: none !important; transition: opacity 0.25s ease !important; }
+    .modal-overlay.open .modal-panel.character-file{ animation: none !important; opacity: 1 !important; }
+    .modal-panel.character-file.closing{ animation: none !important; transform: none !important; opacity: 0 !important; }
+  }
+
+  /* ---------- character dossier modal ---------- */
+  .character-file{
+    background: var(--surface);
+    position: relative;
+  }
+  .character-file::before{
+    content:"";
+    position:absolute; inset:0;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg'><filter id='g'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/></filter><rect width='100%25' height='100%25' filter='url(%23g)'/></svg>");
+    opacity: 0.035;
+    mix-blend-mode: overlay;
+    pointer-events: none;
+  }
+  .file-tab{
+    display:inline-flex; align-items:center; gap: 8px;
+    font-family:'IBM Plex Mono', monospace;
+    font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--faction-color, var(--siren));
+    border: 1px solid var(--line);
+    border-bottom: 2px solid var(--faction-color, var(--siren));
+    padding: 8px 16px;
+    margin-bottom: 26px;
+  }
+  .file-tab-no{ color: var(--ash-dim); text-transform: none; letter-spacing: 0; }
+
+  .character-grid{
+    display:grid;
+    grid-template-columns: minmax(220px, 260px) 1fr;
+    gap: 36px;
+  }
+  @media (max-width: 700px){ .character-grid{ grid-template-columns: 1fr; } }
+
+  .char-photo{
+    position: relative;
+    aspect-ratio: 3/4;
+    border: 1px solid var(--line);
+    background: var(--bg);
+    overflow: hidden;
+  }
+  .char-photo img{
+    position:absolute; inset:0; width:100%; height:100%; object-fit: cover; z-index:1;
+  }
+  .char-photo .crack-bg{
+    position:absolute; inset:-10%; width:120%; height:120%;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg'><filter id='c'><feTurbulence type='turbulence' baseFrequency='0.01 0.05' numOctaves='3' seed='4' result='n'/><feDisplacementMap in='SourceGraphic' in2='n' scale='50'/></filter><rect width='100%25' height='100%25' fill='white' filter='url(%23c)'/></svg>");
+    background-size: 260px 260px;
+    opacity: 0.4;
+    mix-blend-mode: overlay;
+  }
+  .char-photo .crack-vignette{
+    position:absolute; inset:0;
+    background: radial-gradient(circle at 50% 35%, transparent 20%, var(--bg) 95%);
+  }
+  .char-photo .clip{
+    position: absolute; top: 10px; right: 14px;
+    font-size: 18px; opacity: 0.55; z-index: 2;
+    transform: rotate(12deg);
+  }
+  .char-photo .placeholder-label{
+    display:none;
+    position:absolute; bottom: 10px; right: 10px; z-index:2;
+    font-family:'IBM Plex Mono', monospace;
+    font-size: 9px; color: rgba(231,228,220,0.55);
+  }
+  .char-photo.img-missing .placeholder-label{ display:block; }
+
+  .char-rank-tag{
+    margin-top: 12px;
+    display:inline-block;
+    font-family:'IBM Plex Mono', monospace;
+    font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase;
+    border: 1px solid var(--faction-color, var(--line));
+    color: var(--faction-color, var(--ash-dim));
+    padding: 6px 12px;
+  }
+
+  .char-header h3{
+    font-family: 'Song Myung', serif;
+    font-size: 30px;
+    color: var(--ash);
+    margin: 4px 0 10px;
+  }
+  .char-quote{
+    font-family: 'Newsreader', serif;
+    font-style: italic;
+    font-size: 13px;
+    color: var(--ash-dim);
+    line-height: 1.6;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--line);
+    margin-bottom: 16px;
+  }
+
+  .char-table{ display:flex; flex-direction: column; }
+  .char-table .row{
+    display:flex; gap: 20px;
+    padding: 9px 0;
+    border-top: 1px solid var(--line);
+    font-size: 13px;
+  }
+  .char-table .row .k{
+    font-family:'IBM Plex Mono', monospace;
+    font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase;
+    color: var(--ash-dim);
+    width: 64px; flex-shrink: 0;
+    padding-top: 1px;
+  }
+  .char-table .row .v{ color: var(--ash); }
+
+  .char-briefing{
+    margin-top: 18px;
+    border-top: 1px dashed var(--line);
+    padding-top: 14px;
+  }
+  .char-briefing .ft-label{
+    font-family:'IBM Plex Mono', monospace;
+    font-size: 10px; letter-spacing: 0.12em;
+    color: var(--faction-color, var(--siren));
+    margin-bottom: 8px;
+  }
+  .char-briefing p{
+    font-size: 13px; color: var(--ash-dim); line-height: 1.7;
+  }
+
+  .char-stamp{
+    display:inline-block;
+    margin-top: 18px;
+    font-family:'IBM Plex Mono', monospace;
+    font-size: 11px; letter-spacing: 0.14em;
+    color: var(--karsia);
+    border: 2px solid var(--karsia);
+    padding: 5px 12px;
+    transform: rotate(-6deg);
+    opacity: 0.75;
   }
 </style>
 </head>
@@ -1239,22 +1473,22 @@
     <div class="faction-row">
       <span class="num mono">01</span>
       <h3>OMB</h3>
-      <span class="desc">정부 소속 공식 기관. 관료적이고 규율 중심적이며, 예산과 권한은 크지만 절차가 느리다.</span>
+      <span class="desc">[정부 소속 공식 기관] ㅤㅤ"도시는 아직 붕괴하지 않았기에."</span>
     </div>
     <div class="faction-row">
       <span class="num mono">02</span>
       <h3>루멘타 <span class="mono" style="font-size:12px;color:var(--ash-dim)">LUMENTA</span></h3>
-      <span class="desc">대가 없이 돕는 자경단. 시민들에게는 신뢰받지만, 정부와는 대립각을 세운다.</span>
+      <span class="desc">[이타주의적 자경단]ㅤㅤ "삶이란 허무해서는 안되니까."</span>
     </div>
     <div class="faction-row">
       <span class="num mono">03</span>
       <h3>테네브라 <span class="mono" style="font-size:12px;color:var(--ash-dim)">TENEBRA</span></h3>
-      <span class="desc">종교·신앙 계열 단체. 붕괴를 신벌 혹은 정화로 해석하며, 독자적인 동기로 움직인다.</span>
+      <span class="desc">[종교·신앙 계열 단체] ㅤㅤ"세상이 죄를 저질렀음으로."</span>
     </div>
     <div class="faction-row">
       <span class="num mono">04</span>
       <h3>카르시아 <span class="mono" style="font-size:12px;color:var(--ash-dim)">KARSIA</span></h3>
-      <span class="desc">언더그라운드 조직. 오염체·이능력 관련 암시장과 불법 실험에 관여한다.</span>
+      <span class="desc">[언더그라운드 조직]ㅤㅤ "언젠가 이렇게 만든 이들을 향한 칼날을."</span>
     </div>
   </div>
 </section>
@@ -1345,14 +1579,162 @@
     <p class="note">이야기를 써내려가는 자들.</p>
   </div>
 
-  <div class="cast-shell">
-    <div class="count">21</div>
-    <p>CHARACTERS</p>
-    <div class="cast-grid">
-      <div class="slot">?</div><div class="slot">?</div><div class="slot">?</div><div class="slot">?</div>
-      <div class="slot">?</div><div class="slot">?</div><div class="slot">?</div><div class="slot">?</div>
-      <div class="slot">?</div><div class="slot">?</div><div class="slot">?</div><div class="slot">?</div>
-      <div class="slot">?</div><div class="slot">?</div>
+  <div class="cast-filter">
+    <button class="cast-filter-btn active" data-filter="all">전체</button>
+    <button class="cast-filter-btn" data-filter="omb">OMB</button>
+    <button class="cast-filter-btn" data-filter="lumenta">루멘타</button>
+    <button class="cast-filter-btn" data-filter="tenebra">테네브라</button>
+    <button class="cast-filter-btn" data-filter="karsia">카르시아</button>
+    <button class="cast-filter-btn" data-filter="unaffiliated">무소속</button>
+  </div>
+
+  <div class="cast-grid">
+    <div class="cast-card" data-faction="omb" style="--faction-color: var(--omb)" data-num="001" data-label="OMB" tabindex="0" role="button">
+      <img class="cc-photo" src="image/characters/001.jpg" alt="" onerror="this.style.display='none';">
+      <div class="cc-fade"></div>
+      <span class="cc-num">001</span>
+      <span class="cc-mark">?</span>
+      <div><span class="cc-faction">OMB</span><div class="cc-name">Vecca</div></div>
+    </div>
+    <div class="cast-card" data-faction="omb" style="--faction-color: var(--omb)" data-num="002" data-label="OMB" tabindex="0" role="button">
+      <img class="cc-photo" src="image/characters/002.jpg" alt="" onerror="this.style.display='none';">
+      <div class="cc-fade"></div>
+      <span class="cc-num">002</span>
+      <span class="cc-mark">?</span>
+      <div><span class="cc-faction">OMB</span><div class="cc-name">Rina</div></div>
+    </div>
+    <div class="cast-card" data-faction="omb" style="--faction-color: var(--omb)" data-num="003" data-label="OMB" tabindex="0" role="button">
+      <img class="cc-photo" src="image/characters/003.jpg" alt="" onerror="this.style.display='none';">
+      <div class="cc-fade"></div>
+      <span class="cc-num">003</span>
+      <span class="cc-mark">?</span>
+      <div><span class="cc-faction">OMB</span><div class="cc-name">Nao</div></div>
+    </div>
+    <div class="cast-card" data-faction="omb" style="--faction-color: var(--omb)" data-num="004" data-label="OMB" tabindex="0" role="button">
+      <img class="cc-photo" src="image/characters/004.jpg" alt="" onerror="this.style.display='none';">
+      <div class="cc-fade"></div>
+      <span class="cc-num">004</span>
+      <span class="cc-mark">?</span>
+      <div><span class="cc-faction">OMB</span><div class="cc-name">유나</div></div>
+    </div>
+    <div class="cast-card" data-faction="omb" style="--faction-color: var(--omb)" data-num="005" data-label="OMB" tabindex="0" role="button">
+      <img class="cc-photo" src="image/characters/005.jpg" alt="" onerror="this.style.display='none';">
+      <div class="cc-fade"></div>
+      <span class="cc-num">005</span>
+      <span class="cc-mark">?</span>
+      <div><span class="cc-faction">OMB</span><div class="cc-name">رشيد</div></div>
+    </div>
+    <div class="cast-card" data-faction="lumenta" style="--faction-color: var(--lumenta)" data-num="006" data-label="루멘타" tabindex="0" role="button">
+      <img class="cc-photo" src="image/characters/006.jpg" alt="" onerror="this.style.display='none';">
+      <div class="cc-fade"></div>
+      <span class="cc-num">006</span>
+      <span class="cc-mark">?</span>
+      <div><span class="cc-faction">루멘타</span><div class="cc-name">蓮花</div></div>
+    </div>
+    <div class="cast-card" data-faction="lumenta" style="--faction-color: var(--lumenta)" data-num="007" data-label="루멘타" tabindex="0" role="button">
+      <img class="cc-photo" src="image/characters/007.jpg" alt="" onerror="this.style.display='none';">
+      <div class="cc-fade"></div>
+      <span class="cc-num">007</span>
+      <span class="cc-mark">?</span>
+      <div><span class="cc-faction">루멘타</span><div class="cc-name">晴</div></div>
+    </div>
+    <div class="cast-card" data-faction="lumenta" style="--faction-color: var(--lumenta)" data-num="008" data-label="루멘타" tabindex="0" role="button">
+      <img class="cc-photo" src="image/characters/008.jpg" alt="" onerror="this.style.display='none';">
+      <div class="cc-fade"></div>
+      <span class="cc-num">008</span>
+      <span class="cc-mark">?</span>
+      <div><span class="cc-faction">루멘타</span><div class="cc-name">Hayley</div></div>
+    </div>
+    <div class="cast-card" data-faction="lumenta" style="--faction-color: var(--lumenta)" data-num="009" data-label="루멘타" tabindex="0" role="button">
+      <img class="cc-photo" src="image/characters/009.jpg" alt="" onerror="this.style.display='none';">
+      <div class="cc-fade"></div>
+      <span class="cc-num">009</span>
+      <span class="cc-mark">?</span>
+      <div><span class="cc-faction">루멘타</span><div class="cc-name">Felix</div></div>
+    </div>
+    <div class="cast-card" data-faction="tenebra" style="--faction-color: var(--tenebra)" data-num="010" data-label="테네브라" tabindex="0" role="button">
+      <img class="cc-photo" src="image/characters/010.jpg" alt="" onerror="this.style.display='none';">
+      <div class="cc-fade"></div>
+      <span class="cc-num">010</span>
+      <span class="cc-mark">?</span>
+      <div><span class="cc-faction">테네브라</span><div class="cc-name">Δωροθέα</div></div>
+    </div>
+    <div class="cast-card" data-faction="tenebra" style="--faction-color: var(--tenebra)" data-num="011" data-label="테네브라" tabindex="0" role="button">
+      <img class="cc-photo" src="image/characters/011.jpg" alt="" onerror="this.style.display='none';">
+      <div class="cc-fade"></div>
+      <span class="cc-num">011</span>
+      <span class="cc-mark">?</span>
+      <div><span class="cc-faction">테네브라</span><div class="cc-name">Celestina</div></div>
+    </div>
+    <div class="cast-card" data-faction="tenebra" style="--faction-color: var(--tenebra)" data-num="012" data-label="테네브라" tabindex="0" role="button">
+      <img class="cc-photo" src="image/characters/012.jpg" alt="" onerror="this.style.display='none';">
+      <div class="cc-fade"></div>
+      <span class="cc-num">012</span>
+      <span class="cc-mark">?</span>
+      <div><span class="cc-faction">테네브라</span><div class="cc-name">Εἰρήνη</div></div>
+    </div>
+    <div class="cast-card" data-faction="tenebra" style="--faction-color: var(--tenebra)" data-num="013" data-label="테네브라" tabindex="0" role="button">
+      <img class="cc-photo" src="image/characters/013.jpg" alt="" onerror="this.style.display='none';">
+      <div class="cc-fade"></div>
+      <span class="cc-num">013</span>
+      <span class="cc-mark">?</span>
+      <div><span class="cc-faction">테네브라</span><div class="cc-name">Xabier</div></div>
+    </div>
+    <div class="cast-card" data-faction="karsia" style="--faction-color: var(--karsia)" data-num="014" data-label="카르시아" tabindex="0" role="button">
+      <img class="cc-photo" src="image/characters/014.jpg" alt="" onerror="this.style.display='none';">
+      <div class="cc-fade"></div>
+      <span class="cc-num">014</span>
+      <span class="cc-mark">?</span>
+      <div><span class="cc-faction">카르시아</span><div class="cc-name">עשתרות</div></div>
+    </div>
+    <div class="cast-card" data-faction="karsia" style="--faction-color: var(--karsia)" data-num="015" data-label="카르시아" tabindex="0" role="button">
+      <img class="cc-photo" src="image/characters/015.jpg" alt="" onerror="this.style.display='none';">
+      <div class="cc-fade"></div>
+      <span class="cc-num">015</span>
+      <span class="cc-mark">?</span>
+      <div><span class="cc-faction">카르시아</span><div class="cc-name">नाग</div></div>
+    </div>
+    <div class="cast-card" data-faction="karsia" style="--faction-color: var(--karsia)" data-num="016" data-label="카르시아" tabindex="0" role="button">
+      <img class="cc-photo" src="image/characters/016.jpg" alt="" onerror="this.style.display='none';">
+      <div class="cc-fade"></div>
+      <span class="cc-num">016</span>
+      <span class="cc-mark">?</span>
+      <div><span class="cc-faction">카르시아</span><div class="cc-name">Вероника</div></div>
+    </div>
+    <div class="cast-card" data-faction="karsia" style="--faction-color: var(--karsia)" data-num="017" data-label="카르시아" tabindex="0" role="button">
+      <img class="cc-photo" src="image/characters/017.jpg" alt="" onerror="this.style.display='none';">
+      <div class="cc-fade"></div>
+      <span class="cc-num">017</span>
+      <span class="cc-mark">?</span>
+      <div><span class="cc-faction">카르시아</span><div class="cc-name">Ignis</div></div>
+    </div>
+    <div class="cast-card" data-faction="karsia" style="--faction-color: var(--karsia)" data-num="018" data-label="카르시아" tabindex="0" role="button">
+      <img class="cc-photo" src="image/characters/018.jpg" alt="" onerror="this.style.display='none';">
+      <div class="cc-fade"></div>
+      <span class="cc-num">018</span>
+      <span class="cc-mark">?</span>
+      <div><span class="cc-faction">카르시아</span><div class="cc-name">水希</div></div>
+    </div>
+    <div class="cast-card" data-faction="unaffiliated" style="--faction-color: var(--unaffiliated)" data-num="019" data-label="무소속" tabindex="0" role="button">
+      <img class="cc-photo" src="image/characters/019.jpg" alt="" onerror="this.style.display='none';">
+      <div class="cc-fade"></div>
+      <span class="cc-num">019</span>
+      <span class="cc-mark">?</span>
+      <div><span class="cc-faction">무소속</span><div class="cc-name">月見</div></div>
+    </div>
+    <div class="cast-card" data-faction="unaffiliated" style="--faction-color: var(--unaffiliated)" data-num="020" data-label="무소속" tabindex="0" role="button">
+      <img class="cc-photo" src="image/characters/020.jpg" alt="" onerror="this.style.display='none';">
+      <div class="cc-fade"></div>
+      <span class="cc-num">020</span>
+      <span class="cc-mark">?</span>
+      <div><span class="cc-faction">무소속</span><div class="cc-name">Оксана</div></div>
+    </div>
+    <div class="cast-card" data-faction="unaffiliated" style="--faction-color: var(--unaffiliated)" data-num="021" data-label="무소속" tabindex="0" role="button">
+      <img class="cc-photo" src="image/characters/021.jpg" alt="" onerror="this.style.display='none';">
+      <div class="cc-fade"></div>
+      <span class="cc-num">021</span>
+      <span class="cc-mark">?</span>
+      <div><span class="cc-faction">무소속</span><div class="cc-name">Васил</div></div>
     </div>
   </div>
 </section>
@@ -1865,6 +2247,51 @@
   </div>
   <div class="modal-floating-close">CLOSE<span class="esc">ESC</span></div>
 </div>
+
+<div class="modal-overlay" id="modal-character">
+  <div class="modal-panel character-file" style="--faction-color: var(--siren)">
+    <div class="modal-accent"></div>
+    <div class="modal-body">
+      <div class="file-tab">
+        <span>◆ CONFIDENTIAL FILE</span>
+        <span class="file-tab-no">No. <span id="char-caseno">000</span></span>
+      </div>
+      <div class="character-grid">
+        <div class="char-photo-col">
+          <div class="char-photo" id="char-photo-box">
+            <img id="char-photo-img" src="" alt="" onerror="this.style.display='none'; this.parentElement.classList.add('img-missing');">
+            <div class="crack-bg"></div>
+            <div class="crack-vignette"></div>
+            <span class="clip">📎</span>
+            <span class="placeholder-label" id="char-photo-path">image/characters/000.jpg</span>
+          </div>
+          <div class="char-rank-tag" id="char-rank">정보 비공개</div>
+        </div>
+        <div class="char-info-col">
+          <div class="char-header">
+            <div class="modal-eyebrow"><span class="bar"></span>CHARACTER FILE</div>
+            <h3 id="char-name">??? </h3>
+            <div class="char-quote" id="char-quote">"이 인물에 대한 기록은 아직 열람할 수 없습니다."</div>
+          </div>
+          <div class="char-table">
+            <div class="row"><span class="k">소속</span><span class="v" id="char-faction">-</span></div>
+            <div class="row"><span class="k">직책</span><span class="v" id="char-role">미정</span></div>
+            <div class="row"><span class="k">나이</span><span class="v" id="char-age">미정</span></div>
+            <div class="row"><span class="k">신장</span><span class="v" id="char-height">미정</span></div>
+            <div class="row"><span class="k">능력</span><span class="v" id="char-ability">미정</span></div>
+          </div>
+          <div class="char-briefing">
+            <div class="ft-label">BRIEFING</div>
+            <p id="char-briefing">아직 등록되지 않은 인물입니다. 세계관 설정이 확정되는 대로 이곳에 프로필이 채워집니다.</p>
+          </div>
+          <div class="char-stamp" id="char-stamp">CLASSIFIED</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="modal-floating-close">CLOSE<span class="esc">ESC</span></div>
+</div>
+
 <script>
   (function(){
     function openModal(id){
@@ -1876,6 +2303,7 @@
     function closeModal(modal){
       var panel = modal.querySelector('.modal-panel');
       panel.classList.add('closing');
+      var delay = panel.classList.contains('character-file') ? 500 : 520;
       setTimeout(function(){
         modal.style.transition = 'none';
         modal.classList.remove('open');
@@ -1883,7 +2311,7 @@
         document.body.style.overflow = '';
         void modal.offsetWidth;
         modal.style.transition = '';
-      }, 520);
+      }, delay);
     }
 
     document.querySelectorAll('.collapse-card').forEach(function(card){
@@ -1939,6 +2367,250 @@
         });
       }
     });
+
+    // cast filter (animated FLIP reflow)
+    var filterBtns = document.querySelectorAll('.cast-filter-btn');
+    var castCards = document.querySelectorAll('.cast-card');
+    var castGrid = document.querySelector('.cast-grid');
+
+    function applyCastFilter(f){
+      var cards = Array.prototype.slice.call(castCards);
+      var willShow = {};
+      cards.forEach(function(c){
+        willShow[c.dataset.num] = (f === 'all') || (c.dataset.faction === f);
+      });
+
+      var leaving = cards.filter(function(c){ return !c.classList.contains('hidden') && !willShow[c.dataset.num]; });
+      var staying = cards.filter(function(c){ return !c.classList.contains('hidden') && willShow[c.dataset.num]; });
+      var entering = cards.filter(function(c){ return c.classList.contains('hidden') && willShow[c.dataset.num]; });
+
+      if(leaving.length === 0 && entering.length === 0) return;
+
+      var firstRects = {};
+      staying.forEach(function(c){ firstRects[c.dataset.num] = c.getBoundingClientRect(); });
+
+      // leaving cards: flung off-screen downward with rotation
+      leaving.forEach(function(c, i){
+        var dir = (i % 2 === 0) ? 1 : -1;
+        c.style.transition = 'opacity 0.32s ease, transform 0.32s cubic-bezier(0.55, 0.06, 0.9, 0.35)';
+        c.style.opacity = '0';
+        c.style.transform = 'translateY(160px) rotate(' + (dir * 16) + 'deg) scale(0.7)';
+        c.style.pointerEvents = 'none';
+      });
+
+      setTimeout(function(){
+        leaving.forEach(function(c){
+          c.classList.add('hidden');
+          c.style.transition = '';
+          c.style.opacity = '';
+          c.style.transform = '';
+          c.style.pointerEvents = '';
+        });
+        entering.forEach(function(c, i){
+          var dir = (i % 2 === 0) ? -1 : 1;
+          c.classList.remove('hidden');
+          c.style.transition = 'none';
+          c.style.opacity = '0';
+          c.style.transform = 'translateY(-140px) rotate(' + (dir * 18) + 'deg) scale(0.7)';
+        });
+
+        void castGrid.offsetWidth;
+
+        staying.forEach(function(c){
+          var first = firstRects[c.dataset.num];
+          var last = c.getBoundingClientRect();
+          var dx = first.left - last.left;
+          var dy = first.top - last.top;
+          if(Math.abs(dx) > 0.5 || Math.abs(dy) > 0.5){
+            var tilt = dx > 0 ? -7 : (dx < 0 ? 7 : 0);
+            c.style.transition = 'none';
+            c.style.transform = 'translate(' + dx + 'px,' + dy + 'px) rotate(' + tilt + 'deg)';
+          }
+        });
+
+        requestAnimationFrame(function(){
+          staying.forEach(function(c){
+            c.style.transition = 'transform 0.45s cubic-bezier(0.22, 1, 0.36, 1)';
+            c.style.transform = '';
+          });
+          entering.forEach(function(c){
+            c.style.transition = 'opacity 0.4s ease 0.05s, transform 0.4s cubic-bezier(0.22, 1, 0.36, 1) 0.05s';
+            c.style.opacity = '';
+            c.style.transform = '';
+          });
+        });
+
+        setTimeout(function(){
+          staying.concat(entering).forEach(function(c){ c.style.transition = ''; });
+        }, 500);
+      }, 320);
+    }
+
+    filterBtns.forEach(function(btn){
+      btn.addEventListener('click', function(){
+        filterBtns.forEach(function(b){ b.classList.remove('active'); });
+        btn.classList.add('active');
+        applyCastFilter(btn.dataset.filter);
+      });
+    });
+
+    // ============================================================
+    // 캐릭터 데이터 — 여기에 21명 정보를 채워 넣으면 카드 클릭 시 반영됩니다.
+    // 비워두면 자동으로 "미정 / 미공개" 플레이스홀더가 표시됩니다.
+    // 사진은 image/characters/001.jpg ~ 021.jpg 로 넣으면 자동으로 연결됩니다.
+    // ============================================================
+    var characterData = {
+  "001": { name:"베카", en:"Vecca", quote:"거짓말은 언제나 몸이 먼저 알지", role:"특별감찰관", age:"27", height:"163cm", ability:"지원형 × 마나형 × 진실", briefing:"겉으로는 나른하고 무심해 보이지만, 조직 내부의 부패를 유독 견디지 못하는 결벽적인 정의감을 갖고 있다. 감정 표현이 적어 오해를 사지만 한번 신뢰한 사람에게는 과할 정도로 헌신적이다.", rank:"결벽 (潔癖)" }, // OMB
+  "002": { name:"리나", en:"Rina", quote:"진실이 뭔지는 안 중요해. 사람들이 뭘 믿고 싶어하는지가 중요하지.", role:"정보분석관", age:"24", height:"158cm", ability:"지원형 × 마나형 × 혼돈", briefing:"밝고 장난기 넘치는 태도 뒤에 철저한 계산이 숨어 있다. 위험을 게임처럼 즐기며, 상대를 손바닥 위에서 갖고 노는 것에서 쾌감을 느낀다. 정작 자신이 조종당하는 상황은 극도로 싫어한다.", rank:"조종 (操縱)" }, // OMB
+  "003": { name:"나오", en:"Nao", quote:"숨기고 싶은 데를 정확히 맞히는 거야, 재수 없지?", role:"화기지원반", age:"20", height:"159cm", ability:"공격형 × 사격형 × 진실", briefing:"겉으로는 껄렁하고 무심한 태도지만, 임무 앞에서는 누구보다 냉철하고 정확하다. 말수가 적고 감정 표현을 거의 안 하지만, 동료를 은근히 챙기는 츤데레 기질이 있다.", rank:"관통 (貫通)" }, // OMB
+  "004": { name:"유나", en:"", quote:"여기가 어딘지, 저도 가끔 헷갈려요.", role:"결계관리반", age:"22", height:"161cm", ability:"방어형 × 마나형 × 환상", briefing:"조용하고 신중하며, 겉으로는 순진해 보이지만 위기 상황에서 유독 침착해지는 반전이 있다. 자신의 능력이 만드는 왜곡된 공간에 대한 애착이 커서, 종종 그 안에 혼자 머무르는 걸 좋아한다.", rank:"왜곡 (歪曲)" }, // OMB
+  "005": { name:"라시드", en:"Rashid", quote:"이쪽으로! 제가 시선 끌 테니까 다들 먼저 가요.", role:"현장지원반", age:"24", height:"178cm", ability:"지원형 × 완력형 × 환상", briefing:"소탈하고 붙임성 좋으며, 화려함보다 실용을 중시하는 현장형 인간. 남을 챙기는 게 몸에 배어 있어 위험한 순간에도 자기보다 남을 먼저 살핀다.", rank:"유도 (誘導)" }, // OMB
+ 
+  "006": { name:"연화", en:"蓮花", quote:"제 뒤에 서 계세요. 여기는 제가 지킵니다.", role:"야경조 조장", age:"23", height:"165cm", ability:"방어형 × 완력형 × 질서", briefing:"침착하고 책임감이 강하며, 팀원들을 살뜰히 챙기는 맏언니 같은 존재. 겉으로 드러내지 않지만 자경단이 지키지 못한 이들에 대한 죄책감을 오래 품고 있다.", rank:"수호 (守護)" }, // 루멘타
+  "007": { name:"하루", en:"晴", quote:"오늘 컨디션 완전 좋은데? 너, 운 없다.", role:"유격조", age:"21", height:"162cm", ability:"공격형 × 완력형 × 환상", briefing:"밝고 자유분방하며 규율보다 직관을 따르는 편. 루멘타 내에서는 이단아 취급을 받지만 실전 대응 능력만큼은 누구도 부정하지 못한다. 친해지면 스스럼없이 다가오는 붙임성 있는 성격.", rank:"쾌활 (快活)" }, // 루멘타
+  "008": { name:"헤일리", en:"Hayley", quote:"소리 하나로 다 알 수 있어요. 숨 쉬는 것까지.", role:"통신·전자전 담당", age:"22", height:"168cm", ability:"방어형 × 사격형 × 질서", briefing:"침착하고 분석적이며, 규칙과 절차를 중시하는 원칙주의자. 소음에 예민한 만큼 평소엔 조용한 걸 선호하지만, 임무 중엔 누구보다 냉정하게 전황을 통제한다.", rank:"청음 (聽音)" }, // 루멘타
+  "009": { name:"펠릭스", en:"Felix", quote:"괜찮아, 숨 좀 돌리고 다시 가자.", role:"후방지원반", age:"20", height:"174cm", ability:"지원형 × 완력형 × 감정", briefing:"느긋하고 여유로우며, 위기 상황에서도 좀처럼 동요하지 않는 안정감 있는 성격. 남들이 다급해할 때일수록 오히려 침착해지는 편이라 팀의 정신적 지주 역할을 한다.", rank:"안정 (安定)" }, // 루멘타
+ 
+  "010": { name:"도로시아", en:"Dorothea", quote:"자, 다 같이 춤춰볼까요? 끝날 때까지 안 멈출 거예요!", role:"성가대 집행관", age:"19", height:"152cm", ability:"공격형 × 완력형 × 감정", briefing:"겉으로는 순진하고 발랄한 소녀지만, 교단의 처형 임무를 놀이처럼 받아들이는 위험한 면모가 있다. 감정 기복이 크고 즉흥적이며, 자신이 옳다고 믿는 것에 의심이 없다.", rank:"광신 (狂信)" }, // 테네브라
+  "011": { name:"셀레스티나", en:"Celestina", quote:"혼란은 죄입니다. 제가 당신의 머릿속을 정리해드리죠.", role:"계율 심문관", age:"22", height:"160cm", ability:"지원형 × 사격형 × 이성", briefing:"냉철하고 원칙주의적이며, 교단의 규율을 절대적 진리로 여긴다. 감정에 흔들리는 사람을 이해하지 못하지만, 그 때문에 오히려 흔들리는 이들에게 이상한 위안을 주기도 한다.", rank:"정렬 (整列)" }, // 테네브라
+  "012": { name:"이레네", en:"Irene", quote:"당신의 죄를, 조용히 멈춰드리겠습니다.", role:"고해 성사관", age:"25", height:"167cm", ability:"방어형 × 사격형 × 이성", briefing:"극도로 침착하고 절제되어 있으며, 감정을 거의 드러내지 않는다. 교단의 판결자로서 냉정함을 유지하지만, 그 이면에는 스스로에게 내린 오래된 판결을 짊어지고 있다.", rank:"정적 (靜寂)" }, // 테네브라
+  "013": { name:"자비에르", en:"Xabier", quote:"거짓은 이 안에서 통하지 않습니다. 안심하고 서 계세요.", role:"교단 전령", age:"27", height:"181cm", ability:"방어형 × 사격형 × 진실", briefing:"냉철하고 격식을 중시하며, 감정을 거의 드러내지 않는 신사적인 태도를 유지한다. 교단의 명령에 절대적으로 충성하지만, 그 이면에 개인적인 의구심을 조용히 품고 있다.", rank:"결백 (潔白)" }, // 테네브라
+ 
+  "014": { name:"아스타로트", en:"Astaroth", quote:"먹잇감을 고를 여유는 없어. 앞에 있으면 다 먹어치울 뿐.", role:"심연의 계약자", age:"불명 (외견상 20대 초반)", height:"165cm", ability:"공격형 × 완력형 × 혼돈", briefing:"인간을 초월한 듯한 거리감과 나른한 우월감을 지녔지만, 카르시아 내부에서만큼은 의외로 규율을 지킨다. 자신의 힘을 통제 못 할까 봐 내심 두려워하는 면이 있다.", rank:"폭식 (暴食)" }, // 카르시아
+  "015": { name:"나가", en:"नाग", quote:"어디를 맞혀야 제일 아픈지, 다 계산해뒀거든.", role:"독설꾼", age:"20", height:"158cm", ability:"공격형 × 사격형 × 이성", briefing:"장난스럽고 능글맞은 태도 뒤에 냉철한 계산이 숨어 있다. 상대를 조롱하며 서서히 몰아붙이는 걸 즐기고, 감정보다 효율을 우선시하는 실용주의자.", rank:"정밀 (精密)" }, // 카르시아
+  "016": { name:"베로니카", en:"Вероника", quote:"제 방어는 규칙이 없어요. 그래서 아무도 못 뚫죠.", role:"수호계약자", age:"24", height:"166cm", ability:"방어형 × 마나형 × 혼돈", briefing:"과묵하고 차분하며, 자신이 지키기로 한 대상에게는 절대적으로 헌신한다. 감정을 잘 드러내지 않지만 사역체를 통해 무의식적인 동요가 새어나오곤 한다.", rank:"헌신 (獻身)" }, // 카르시아
+  "017": { name:"이그니스", en:"Ignis", quote:"다 타버려라! 어차피 멈출 생각도 없었어.", role:"화형집행자", age:"23", height:"170cm", ability:"공격형 × 마나형 × 혼돈", briefing:"격정적이고 파괴적이며, 규칙이나 절제를 극도로 싫어한다. 카르시아 내에서도 손꼽히는 위험인물로 취급받지만, 순수하게 감정에 솔직한 면이 있어 의외로 거짓말을 못 한다.", rank:"광란 (狂亂)" }, // 카르시아
+  "018": { name:"미즈키", en:"水希", quote:"위험해요~ 근데 조금만 있다 가실래요? 헤헤.", role:"오염 실험체", age:"불명 (외견상 10대 후반)", height:"155cm(액상 상태 유동적)", ability:"지원형 × 마나형 × 혼돈", briefing:"천진난만하고 나른하며, 위험한 존재라는 자각이 옅다. 감정 기복에 따라 몸이 반응하는 걸 재밌어하며, 사람을 잘 따르지만 그 호의가 어디까지 진심인지는 아무도 모른다.", rank:"침식 (侵蝕)" }, // 카르시아
+ 
+  "019": { name:"츠키미", en:"月見", quote:"한 번이면 충분하다. 두 번은 필요 없어.", role:"없음 (떠돌이 검객)", age:"26", height:"168cm", ability:"공격형 × 완력형 × 질서", briefing:"과묵하고 자기 절제가 강하며, 어떤 세력에도 얽매이지 않고 자신만의 규율을 따른다. 냉정해 보이지만 약자를 지나치지 못하는 오래된 습관이 있다.", rank:"단절 (斷絶)" }, // 무소속
+  "020": { name:"옥사나", en:"Оксана", quote:"도망가도 소용없어요. 제가 표시해뒀거든요, 후훗.", role:"없음 (독립 활동)", age:"21", height:"156cm", ability:"공격형 × 마나형 × 감정", briefing:"겉으로는 사랑스럽고 발랄하지만, 한번 집착하는 대상에게는 소름 끼칠 정도로 맹목적이다. 소속 없이 혼자 움직이는 이유도 '누구에게도 방해받고 싶지 않아서'. 호불호가 극단적이며 경계가 없다.", rank:"집착 (執着)" }, // 무소속
+  "021": { name:"바실", en:"Васил", quote:"웃고 있다고 봐주는 건 아니야. 그냥 이게 제일 재밌는 표정이라서.", role:"없음 (현상금 사냥꾼)", age:"25", height:"183cm", ability:"공격형 × 완력형 × 이성", briefing:"겉으로는 광기 어린 살인귀처럼 보이지만, 실제로는 철저히 계산적이고 감정에 휘둘리지 않는 프로페셔널. 표적 외에는 관심이 없으며, 누구의 편도 들지 않는 철저한 중립을 지킨다.", rank:"계측 (計測)" }, // 무소속
+    };
+
+    // character dossier modal
+    var charOverlay = document.getElementById('modal-character');
+    if(charOverlay){
+      var charPanel = charOverlay.querySelector('.modal-panel');
+      var charGrid = charOverlay.querySelector('.character-grid');
+      var charPhotoBox = document.getElementById('char-photo-box');
+      var charPhotoImg = document.getElementById('char-photo-img');
+      var charPhotoPath = document.getElementById('char-photo-path');
+      var charCaseNo = document.getElementById('char-caseno');
+      var charName = document.getElementById('char-name');
+      var charFaction = document.getElementById('char-faction');
+      var charRank = document.getElementById('char-rank');
+      var charQuote = document.getElementById('char-quote');
+      var charRole = document.getElementById('char-role');
+      var charAge = document.getElementById('char-age');
+      var charHeight = document.getElementById('char-height');
+      var charAbility = document.getElementById('char-ability');
+      var charBriefing = document.getElementById('char-briefing');
+      var charStamp = document.getElementById('char-stamp');
+
+      var castOrder = Array.prototype.slice.call(castCards);
+      var currentCharIdx = 0;
+
+      function renderCharacterAt(idx){
+        var len = castOrder.length;
+        idx = ((idx % len) + len) % len;
+        currentCharIdx = idx;
+        var card = castOrder[idx];
+        var num = card.dataset.num;
+        var faction = card.dataset.faction;
+        var label = card.dataset.label;
+        var d = characterData[num] || {};
+
+        charPanel.style.setProperty('--faction-color', 'var(--' + faction + ')');
+        charCaseNo.textContent = num;
+        charName.textContent = d.name ? (d.name + (d.en ? '  ·  ' + d.en : '')) : '???';
+        charFaction.textContent = label;
+        charRank.textContent = d.rank || '정보 비공개';
+        charQuote.textContent = d.quote ? ('"' + d.quote + '"') : '"이 인물에 대한 기록은 아직 열람할 수 없습니다."';
+        charRole.textContent = d.role || '미정';
+        charAge.textContent = d.age || '미정';
+        charHeight.textContent = d.height || '미정';
+        charAbility.textContent = d.ability || '미정';
+        charBriefing.textContent = d.briefing || '아직 등록되지 않은 인물입니다. 세계관 설정이 확정되는 대로 이곳에 프로필이 채워집니다.';
+        charStamp.textContent = d.name ? 'CLASSIFIED' : 'CLASSIFIED';
+
+        var imgPath = 'image/characters/' + num + '.jpg';
+        charPhotoImg.style.display = '';
+        charPhotoBox.classList.remove('img-missing');
+        charPhotoImg.src = imgPath;
+        charPhotoPath.textContent = imgPath;
+      }
+
+      function goToCharacter(idx, dir){
+        var slide = dir * 40;
+        var tilt = dir * 8;
+        charPanel.style.transition = 'none';
+        charPanel.style.transform = 'translateX(' + slide + 'px) rotate(' + tilt + 'deg) scale(0.96)';
+        charPanel.style.opacity = '0.35';
+        void charPanel.offsetWidth;
+        renderCharacterAt(idx);
+        requestAnimationFrame(function(){
+          charPanel.style.transition = 'transform 0.55s cubic-bezier(0.25, 1.05, 0.5, 1), opacity 0.3s ease';
+          charPanel.style.transform = '';
+          charPanel.style.opacity = '';
+        });
+        setTimeout(function(){ charPanel.style.transition = ''; }, 580);
+      }
+
+      castOrder.forEach(function(card, i){
+        function openCharacter(){
+          renderCharacterAt(i);
+          openModal('modal-character');
+        }
+        card.addEventListener('click', openCharacter);
+        card.addEventListener('keydown', function(e){
+          if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); openCharacter(); }
+        });
+      });
+
+      // drag / swipe the whole file to flip to next or previous character
+      var dragStartX = null, dragging = false;
+      charPanel.style.touchAction = 'pan-y';
+      charPanel.addEventListener('pointerdown', function(e){
+        if(e.target.closest('.modal-close, .modal-floating-close, a, button')) return;
+        dragStartX = e.clientX;
+        dragging = true;
+        charPanel.setPointerCapture(e.pointerId);
+        charPanel.classList.add('grabbing');
+        charPanel.style.transition = 'none';
+      });
+      charPanel.addEventListener('pointermove', function(e){
+        if(!dragging || dragStartX === null) return;
+        var dx = e.clientX - dragStartX;
+        var moveX = Math.max(-90, Math.min(90, dx * 0.5));
+        var rot = Math.max(-11, Math.min(11, dx * 0.06));
+        charPanel.style.transform = 'translateX(' + moveX + 'px) rotate(' + rot + 'deg)';
+      });
+      function endDrag(e){
+        if(!dragging) return;
+        dragging = false;
+        charPanel.classList.remove('grabbing');
+        if(dragStartX === null) return;
+        var dx = e.clientX - dragStartX;
+        dragStartX = null;
+        if(Math.abs(dx) > 55){
+          var dir = dx < 0 ? 1 : -1; // dragged left -> next character
+          goToCharacter(currentCharIdx + dir, dir);
+        } else {
+          charPanel.style.transition = 'transform 0.4s cubic-bezier(0.3, 1.1, 0.5, 1)';
+          charPanel.style.transform = '';
+          setTimeout(function(){ charPanel.style.transition = ''; }, 400);
+        }
+      }
+      charPanel.addEventListener('pointerup', endDrag);
+      charPanel.addEventListener('pointercancel', endDrag);
+
+      // keyboard arrows while character modal open
+      document.addEventListener('keydown', function(e){
+        if(!charOverlay.classList.contains('open')) return;
+        if(e.key === 'ArrowRight'){ goToCharacter(currentCharIdx + 1, 1); }
+        if(e.key === 'ArrowLeft'){ goToCharacter(currentCharIdx - 1, -1); }
+      });
+    }
   })();
 </script>
 
